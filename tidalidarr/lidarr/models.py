@@ -9,7 +9,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class LidarrConfig(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="lidarr_")
 
-    api_url: HttpUrl
+    api_url: HttpUrl = HttpUrl("http://127.0.0.1:8686/api/v1")
     api_key: str
     download_path: Path = Path("/downloads")
 
