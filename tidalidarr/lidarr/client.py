@@ -56,6 +56,11 @@ class LidarrClient:
         )
 
     def get_missing_albums(self) -> Iterator[str]:
+        """
+        Call Lidarr API to obtain all the missing releases.
+        While paginating, we yield one string at a time to query Tidal.
+        The query string is composed of the artist and the release title.
+        """
         page_size = 10
         url = f"{self._config.api_url}/wanted/missing"
         params: dict[str, Any] = {
@@ -78,12 +83,22 @@ class LidarrClient:
             params["page"] += 1
 
     def trigger_import(self, folder: Path) -> None:
+        """
+        This is the automatic scanning feature of Lidarr.
+        However it does not seem to trigger imports most of the time...
+        """
         url = f"{self._config.api_url}/command"
         path = self._config.download_path / folder
         payload = {"name": "DownloadedAlbumsScan", "path": path.as_posix()}
         self._post(url, payload=payload)
 
     def manual_import(self, folder: Path) -> None:
+        """
+        The first call is the same as clicking "manual import" in Lidarr's web UI
+        We use it by passing a specific release path so that we only scan the tracks of a single release at at time.
+        With this call, Lidarr does some scanning of the files and returns its best guess based on the folder name.
+        If properly recognized, we trigger the actual import.
+        """
         url = f"{self._config.api_url}/manualimport"
         path = self._config.download_path / folder
         params = {
@@ -107,6 +122,10 @@ class LidarrClient:
         self._manual_import(missing_tracks)
 
     def _manual_import(self, missing_tracks: list[LidarrMissingTrack]) -> None:
+        """
+        This triggers the actual import of tracks by Lidarr.
+        We use the output of the previous command and return to Lidarr the list of tracks validated for import.
+        """
         url = f"{self._config.api_url}/command"
         payload = {
             "name": "ManualImport",
@@ -117,6 +136,10 @@ class LidarrClient:
         self._post(url, payload=payload)
 
     def cleanup_download_folder(self) -> None:
+        """
+        Clean up the download folder after import has completed.
+        Using rmdir only empty folders are deleted.
+        """
         paths = [(root / name) for root, dirs, _ in self._config.download_path.walk(top_down=False) for name in dirs]
         for path in paths:
             with suppress(OSError):

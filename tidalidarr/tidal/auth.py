@@ -32,12 +32,22 @@ class TidalAuth(AuthBase):
 
     @overrides
     def __call__(self, r: PreparedRequest) -> PreparedRequest:
+        """
+        This Auth class is called on every request made by the TidalClient.
+        It is responsible for injecting the bearer token in each call.
+        If the token does not exist or is invalid, it is responsible for triggering
+        a new login attempt.
+        """
         if r.path_url != "/v1/sessions" and not self.verify_access_token():
             self._token = self.login()
         r.headers.update({"Authorization": f"Bearer {self._token.access_token}"})
         return r
 
     def get_device_authorization(self) -> TidalDeviceAuth:
+        """
+        When there is no token active, request a new device authorization.
+        The response contains a link to access and login via browser
+        """
         url = f"{self._config.auth_url}/device_authorization"
         body = {
             "client_id": self._config.client_id,
@@ -56,6 +66,10 @@ class TidalAuth(AuthBase):
         reraise=True,
     )
     def login_with_device_code(self, device_authorization: TidalDeviceAuth) -> TidalToken:
+        """
+        Attempt to login with a device authorization.
+        Retry while the device has not been approved via browser for 5 min.
+        """
         url = f"{self._config.auth_url}/token"
         body = {
             "client_id": self._config.client_id,
@@ -110,6 +124,12 @@ class TidalAuth(AuthBase):
         return resp.status_code == 200
 
     def login(self) -> TidalToken:
+        """
+        Main login function, try to load the token from .json file
+        Refresh the access token if necessary.
+        Otherwise start a new login via device authorization
+        """
+
         token = self.load_token()
 
         if not token:

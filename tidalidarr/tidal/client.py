@@ -52,6 +52,10 @@ class TidalClient:
         )
 
     def _search(self, query: str) -> TidalSearchResult:
+        """
+        Trigger a search to Tidal's API using a query string built with Artist + release name
+        If found, we return the search model with all the parsed fields.
+        """
         logger.info(f"Searching for: {query}")
         params = {"query": query, "countryCode": self._config.country_code}
         url = f"{self._config.api_hifi_url}/search"
@@ -64,6 +68,12 @@ class TidalClient:
         return result
 
     def search(self, query: str) -> Path | None:
+        """
+        This function pilots the Tidal logic:
+        - Search for a query string (filtering recent queries that failed)
+        - If found an Album in the search result we try to download it
+        - If successful, return the path where the Album was saved
+        """
         if query in self._not_found and (time.time() - self._not_found[query]) < self._config.check_interval:
             return None
         search_result = self._search(query)
@@ -78,6 +88,12 @@ class TidalClient:
         return album.folder
 
     def download_album(self, album: TidalAlbum) -> None:
+        """
+        Download an album from Tidal:
+        - Download once the album cover (written to each track)
+        - Get the list of tracks and their stream URL
+        - Download each track
+        """
         logger.info(f"Downloading album: {album.title}")
         album.cover_bytes = self.get_album_cover(album)
         track_list = self.get_track_list(album)
@@ -123,6 +139,15 @@ class TidalClient:
         return lyrics
 
     def download_track(self, album: TidalAlbum, track: TidalTrack, track_url: HttpUrl) -> None:
+        """
+        Download logic:
+        - Prepare the path (noop if exists)
+        - Skip existing files
+        - Download the track to a temporary file to avoid writing incomplete files
+        - Write the metadata to the file: cover, lyrics, tags
+        - Finally move the temporary file to the final path once complete
+        """
+
         folder = self._config.download_path / album.folder
         folder.mkdir(parents=True, exist_ok=True)
 
