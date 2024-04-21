@@ -1,0 +1,58 @@
+[tool.mypy]
+plugins = "pydantic.mypy"
+
+[tool.ruff]
+cache-dir = ".cache/ruff_cache"
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+select = [
+    "A",     # flake8-builtins
+    "ARG",   # flake8-unused-arguments
+    "ASYNC", # flake8-async
+    "B",     # Bugbear
+    "BLE",   # flake8-blind-except
+    "C4",    # flake8-comprehensions
+    "DTZ",   # flake8-datetimez
+    "E",     # pycodestyle error
+    "EM",    # flake8-errmsg
+    "ERA",   # eradicate
+    "F",     # pyflakes
+    "FBT",   # flake8-boolean-trap
+    "FIX",   # flake8-fixme
+    "INT",   # flake8-gettext
+    "I",     # isort
+    "N",     # pep8-naming
+    "PIE",   # flake8-pie
+    "PLE",   # pylint error
+    "PT",    # flake8-pytest-style
+    "PTH",   # flake8-use-pathlib
+    "Q",     # flake8-quotes
+    "RET",   # flake8-return
+    "RSE",   # flake8-raise
+    "RUF",   # ruff
+    "S",     # flake8-bandit
+    "SIM",   # flake8-simplify
+    "SLF",   # flake8-self
+    "T20",   # flake8-print
+    "TRY",   # tryceratops
+    "UP",    # pyupgrade
+    "W",     # pycodestyle warning
+]
+fixable = ["ALL"]
+unfixable = []
+ignore = [
+    "A003",   # Class attribute {name} is shadowing a Python builtin
+    "EM101",  # Exception must not use a string literal, assign to variable first
+    "EM102",  # Exception must not use an f-string literal, assign to variable first
+    "ERA001", # Found commented-out code
+    "FIX002", # Line contains TODO, consider resolving the issue
+    "N801",   # Class name `...` should use CapWords convention
+    "N803",   # Argument name `...` should be lowercase
+    "S101",   # Use of assert detected
+    "S104",   # Possible binding to all interfaces
+    "S311",   # Standard pseudo-random generators are not suitable for cryptographic purposes
+    "S608",   # Possible SQL injection vector through string-based query construction
+    "TRY003", # Avoid specifying long messages outside the exception class
+]

@@ -1,0 +1,1169 @@
+{
+    "artists": {
+        "limit": 10,
+        "offset": 0,
+        "totalNumberOfItems": 2,
+        "items": [
+            {
+                "id": 5469318,
+                "name": "Sekai No Owari",
+                "artistTypes": [
+                    "ARTIST",
+                    "CONTRIBUTOR"
+                ],
+                "url": "http://www.tidal.com/artist/5469318",
+                "picture": "a4c644d2-7d4a-4c79-9f5a-96af5c09c988",
+                "popularity": 40,
+                "artistRoles": [
+                    {
+                        "categoryId": -1,
+                        "category": "Artist"
+                    },
+                    {
+                        "categoryId": 10,
+                        "category": "Production team"
+                    },
+                    {
+                        "categoryId": 1,
+                        "category": "Producer"
+                    },
+                    {
+                        "categoryId": 11,
+                        "category": "Performer"
+                    },
+                    {
+                        "categoryId": 2,
+                        "category": "Songwriter"
+                    },
+                    {
+                        "categoryId": 3,
+                        "category": "Engineer"
+                    }
+                ],
+                "mixes": {
+                    "ARTIST_MIX": "000d296273af34f133b013692b1daa"
+                }
+            },
+            {
+                "id": 41665595,
+                "name": "\u6751\u677e\u795f\u7d99 & SEKAI NO OWARI",
+                "artistTypes": [
+                    "ARTIST"
+                ],
+                "url": "http://www.tidal.com/artist/41665595",
+                "picture": null,
+                "popularity": 0,
+                "artistRoles": [],
+                "mixes": {}
+            }
+        ]
+    },
+    "albums": {
+        "limit": 10,
+        "offset": 0,
+        "totalNumberOfItems": 32,
+        "items": [
+            {
+                "id": 190865929,
+                "title": "scent of memory",
+                "duration": 2769,
+                "streamReady": true,
+                "adSupportedStreamReady": true,
+                "djReady": true,
+                "stemReady": false,
+                "streamStartDate": "2021-07-21T00:00:00.000+0000",
+                "allowStreaming": true,
+                "premiumStreamingOnly": false,
+                "numberOfTracks": 12,
+                "numberOfVideos": 0,
+                "numberOfVolumes": 1,
+                "releaseDate": "2021-07-21",
+                "copyright": "\u00a9 2021 UNIVERSAL MUSIC LLC",
+                "type": "ALBUM",
+                "version": null,
+                "url": "http://www.tidal.com/album/190865929",
+                "cover": "a1e707be-71a7-4d8b-a408-47edfc910d92",
+                "vibrantColor": "#cc566c",
+                "videoCover": null,
+                "explicit": true,
+                "upc": "00602438470143",
+                "popularity": 13,
+                "audioQuality": "LOSSLESS",
+                "audioModes": [
+                    "STEREO"
+                ],
+                "mediaMetadata": {
+                    "tags": [
+                        "LOSSLESS"
+                    ]
+                },
+                "artists": [
+                    {
+                        "id": 5469318,
+                        "name": "Sekai No Owari",
+                        "type": "MAIN",
+                        "picture": "a4c644d2-7d4a-4c79-9f5a-96af5c09c988"
+                    }
+                ]
+            },
+            {
+                "id": 349242426,
+                "title": "Nautilus",
+                "duration": 2841,
+                "streamReady": true,
+                "adSupportedStreamReady": true,
+                "djReady": true,
+                "stemReady": false,
+                "streamStartDate": "2024-03-13T00:00:00.000+0000",
+                "allowStreaming": true,
+                "premiumStreamingOnly": false,
+                "numberOfTracks": 12,
+                "numberOfVideos": 0,
+                "numberOfVolumes": 1,
+                "releaseDate": "2024-03-13",
+                "copyright": "\u00a9 2024 UNIVERSAL MUSIC LLC",
+                "type": "ALBUM",
+                "version": null,
+                "url": "http://www.tidal.com/album/349242426",
+                "cover": "372554dc-4918-42ae-8288-75c2a3ab46da",
+                "vibrantColor": "#bad9ac",
+                "videoCover": null,
+                "explicit": false,
+                "upc": "00602465251630",
+                "popularity": 13,
+                "audioQuality": "HI_RES",
+                "audioModes": [
+                    "STEREO"
+                ],
+                "mediaMetadata": {
+                    "tags": [
+                        "LOSSLESS",
+                        "HIRES_LOSSLESS",
+                        "MQA"
+                    ]
+                },
+                "artists": [
+                    {
+                        "id": 5469318,
+                        "name": "Sekai No Owari",
+                        "type": "MAIN",
+                        "picture": "a4c644d2-7d4a-4c79-9f5a-96af5c09c988"
+                    }
+                ]
+            },
+            {
+                "id": 349223123,
+                "title": "Nautilus",
+                "duration": 2841,
+                "streamReady": true,
+                "adSupportedStreamReady": true,
+                "djReady": true,
+                "stemReady": false,
+                "streamStartDate": "2024-03-13T00:00:00.000+0000",
+                "allowStreaming": true,
+                "premiumStreamingOnly": false,
+                "numberOfTracks": 12,
+                "numberOfVideos": 0,
+                "numberOfVolumes": 1,
+                "releaseDate": "2024-03-13",
+                "copyright": "\u00a9 2024 UNIVERSAL MUSIC LLC",
+                "type": "ALBUM",
+                "version": null,
+                "url": "http://www.tidal.com/album/349223123",
+                "cover": "a6c70778-5eef-4935-ab8f-807b1d2ea0a0",
+                "vibrantColor": "#bad9ac",
+                "videoCover": null,
+                "explicit": false,
+                "upc": "00602465251548",
+                "popularity": 7,
+                "audioQuality": "LOSSLESS",
+                "audioModes": [
+                    "STEREO"
+                ],
+                "mediaMetadata": {
+                    "tags": [
+                        "LOSSLESS"
+                    ]
+                },
+                "artists": [
+                    {
+                        "id": 5469318,
+                        "name": "Sekai No Owari",
+                        "type": "MAIN",
+                        "picture": "a4c644d2-7d4a-4c79-9f5a-96af5c09c988"
+                    }
+                ]
+            },
+            {
+                "id": 330656049,
+                "title": "Lip",
+                "duration": 3582,
+                "streamReady": true,
+                "adSupportedStreamReady": true,
+                "djReady": true,
+                "stemReady": false,
+                "streamStartDate": "2023-08-04T00:00:00.000+0000",
+                "allowStreaming": true,
+                "premiumStreamingOnly": false,
+                "numberOfTracks": 13,
+                "numberOfVideos": 0,
+                "numberOfVolumes": 1,
+                "releaseDate": "2019-02-27",
+                "copyright": "TOY'S FACTORY",
+                "type": "ALBUM",
+                "version": null,
+                "url": "http://www.tidal.com/album/330656049",
+                "cover": "1a0777bf-0660-43ad-9eb2-01362db709d1",
+                "vibrantColor": "#b1394e",
+                "videoCover": null,
+                "explicit": false,
+                "upc": "4988061910628",
+                "popularity": 5,
+                "audioQuality": "LOSSLESS",
+                "audioModes": [
+                    "STEREO"
+                ],
+                "mediaMetadata": {
+                    "tags": [
+                        "LOSSLESS"
+                    ]
+                },
+                "artists": [
+                    {
+                        "id": 5469318,
+                        "name": "Sekai No Owari",
+                        "type": "MAIN",
+                        "picture": "a4c644d2-7d4a-4c79-9f5a-96af5c09c988"
+                    }
+                ]
+            },
+            {
+                "id": 330656436,
+                "title": "SEKAI NO OWARI 2010-2019",
+                "duration": 8669,
+                "streamReady": true,
+                "adSupportedStreamReady": true,
+                "djReady": true,
+                "stemReady": false,
+                "streamStartDate": "2023-08-04T00:00:00.000+0000",
+                "allowStreaming": true,
+                "premiumStreamingOnly": false,
+                "numberOfTracks": 30,
+                "numberOfVideos": 0,
+                "numberOfVolumes": 2,
+                "releaseDate": "2021-02-10",
+                "copyright": "TOY'S FACTORY",
+                "type": "ALBUM",
+                "version": null,
+                "url": "http://www.tidal.com/album/330656436",
+                "cover": "a1595786-070b-4b56-a877-0493e0871eb4",
+                "vibrantColor": "#FFFFFF",
+                "videoCover": null,
+                "explicit": false,
+                "upc": "4988061913063",
+                "popularity": 4,
+                "audioQuality": "LOSSLESS",
+                "audioModes": [
+                    "STEREO"
+                ],
+                "mediaMetadata": {
+                    "tags": [
+                        "LOSSLESS"
+                    ]
+                },
+                "artists": [
+                    {
+                        "id": 5469318,
+                        "name": "Sekai No Owari",
+                        "type": "MAIN",
+                        "picture": "a4c644d2-7d4a-4c79-9f5a-96af5c09c988"
+                    }
+                ]
+            },
+            {
+                "id": 330655853,
+                "title": "Tree",
+                "duration": 3347,
+                "streamReady": true,
+                "adSupportedStreamReady": true,
+                "djReady": true,
+                "stemReady": false,
+                "streamStartDate": "2023-08-04T00:00:00.000+0000",
+                "allowStreaming": true,
+                "premiumStreamingOnly": false,
+                "numberOfTracks": 13,
+                "numberOfVideos": 0,
+                "numberOfVolumes": 1,
+                "releaseDate": "2015-01-14",
+                "copyright": "TOY'S FACTORY",
+                "type": "ALBUM",
+                "version": null,
+                "url": "http://www.tidal.com/album/330655853",
+                "cover": "6e52a026-289e-4c13-b883-0c694f7305a7",
+                "vibrantColor": "#d05f90",
+                "videoCover": null,
+                "explicit": false,
+                "upc": "4988061906188",
+                "popularity": 4,
+                "audioQuality": "LOSSLESS",
+                "audioModes": [
+                    "STEREO"
+                ],
+                "mediaMetadata": {
+                    "tags": [
+                        "LOSSLESS"
+                    ]
+                },
+                "artists": [
+                    {
+                        "id": 5469318,
+                        "name": "Sekai No Owari",
+                        "type": "MAIN",
+                        "picture": "a4c644d2-7d4a-4c79-9f5a-96af5c09c988"
+                    }
+                ]
+            },
+            {
+                "id": 330656101,
+                "title": "Eye",
+                "duration": 2943,
+                "streamReady": true,
+                "adSupportedStreamReady": true,
+                "djReady": true,
+                "stemReady": false,
+                "streamStartDate": "2023-08-04T00:00:00.000+0000",
+                "allowStreaming": true,
+                "premiumStreamingOnly": false,
+                "numberOfTracks": 13,
+                "numberOfVideos": 0,
+                "numberOfVolumes": 1,
+                "releaseDate": "2019-02-27",
+                "copyright": "TOY'S FACTORY",
+                "type": "ALBUM",
+                "version": null,
+                "url": "http://www.tidal.com/album/330656101",
+                "cover": "48482ba8-c88e-4953-9a5f-493f8baa0d37",
+                "vibrantColor": "#FFFFFF",
+                "videoCover": null,
+                "explicit": false,
+                "upc": "4988061910611",
+                "popularity": 3,
+                "audioQuality": "LOSSLESS",
+                "audioModes": [
+                    "STEREO"
+                ],
+                "mediaMetadata": {
+                    "tags": [
+                        "LOSSLESS"
+                    ]
+                },
+                "artists": [
+                    {
+                        "id": 5469318,
+                        "name": "Sekai No Owari",
+                        "type": "MAIN",
+                        "picture": "a4c644d2-7d4a-4c79-9f5a-96af5c09c988"
+                    }
+                ]
+            },
+            {
+                "id": 330655997,
+                "title": "ENTERTAINMENT",
+                "duration": 4251,
+                "streamReady": true,
+                "adSupportedStreamReady": true,
+                "djReady": true,
+                "stemReady": false,
+                "streamStartDate": "2023-08-04T00:00:00.000+0000",
+                "allowStreaming": true,
+                "premiumStreamingOnly": false,
+                "numberOfTracks": 16,
+                "numberOfVideos": 0,
+                "numberOfVolumes": 1,
+                "releaseDate": "2012-07-18",
+                "copyright": "TOY'S FACTORY",
+                "type": "ALBUM",
+                "version": null,
+                "url": "http://www.tidal.com/album/330655997",
+                "cover": "abd1c681-266d-4f02-a691-3682a46a5863",
+                "vibrantColor": "#c1d16b",
+                "videoCover": null,
+                "explicit": false,
+                "upc": "4988061904085",
+                "popularity": 3,
+                "audioQuality": "LOSSLESS",
+                "audioModes": [
+                    "STEREO"
+                ],
+                "mediaMetadata": {
+                    "tags": [
+                        "LOSSLESS"
+                    ]
+                },
+                "artists": [
+                    {
+                        "id": 5469318,
+                        "name": "Sekai No Owari",
+                        "type": "MAIN",
+                        "picture": "a4c644d2-7d4a-4c79-9f5a-96af5c09c988"
+                    }
+                ]
+            },
+            {
+                "id": 350581759,
+                "title": "Nautilus",
+                "duration": 2841,
+                "streamReady": true,
+                "adSupportedStreamReady": true,
+                "djReady": true,
+                "stemReady": false,
+                "streamStartDate": "2024-03-13T00:00:00.000+0000",
+                "allowStreaming": true,
+                "premiumStreamingOnly": false,
+                "numberOfTracks": 12,
+                "numberOfVideos": 0,
+                "numberOfVolumes": 1,
+                "releaseDate": "2024-03-13",
+                "copyright": "\u00a9 2024 UNIVERSAL MUSIC LLC",
+                "type": "ALBUM",
+                "version": null,
+                "url": "http://www.tidal.com/album/350581759",
+                "cover": "415eb1c8-3113-4850-9068-9d9b905a7572",
+                "vibrantColor": "#bad9ac",
+                "videoCover": null,
+                "explicit": false,
+                "upc": "00602465251647",
+                "popularity": 1,
+                "audioQuality": "LOW",
+                "audioModes": [
+                    "DOLBY_ATMOS"
+                ],
+                "mediaMetadata": {
+                    "tags": [
+                        "DOLBY_ATMOS"
+                    ]
+                },
+                "artists": [
+                    {
+                        "id": 5469318,
+                        "name": "Sekai No Owari",
+                        "type": "MAIN",
+                        "picture": "a4c644d2-7d4a-4c79-9f5a-96af5c09c988"
+                    }
+                ]
+            },
+            {
+                "id": 300900198,
+                "title": "Turquoise / Saraba / Butterfly Effect",
+                "duration": 619,
+                "streamReady": true,
+                "adSupportedStreamReady": true,
+                "djReady": true,
+                "stemReady": false,
+                "streamStartDate": "2023-06-28T00:00:00.000+0000",
+                "allowStreaming": true,
+                "premiumStreamingOnly": false,
+                "numberOfTracks": 3,
+                "numberOfVideos": 0,
+                "numberOfVolumes": 1,
+                "releaseDate": "2023-05-16",
+                "copyright": "\u00a9 2023 UNIVERSAL MUSIC LLC",
+                "type": "SINGLE",
+                "version": null,
+                "url": "http://www.tidal.com/album/300900198",
+                "cover": "f528f212-9eb5-4db5-914b-99750f916b5b",
+                "vibrantColor": "#48e8e6",
+                "videoCover": null,
+                "explicit": false,
+                "upc": "00602455911797",
+                "popularity": 1,
+                "audioQuality": "HI_RES",
+                "audioModes": [
+                    "STEREO"
+                ],
+                "mediaMetadata": {
+                    "tags": [
+                        "LOSSLESS",
+                        "HIRES_LOSSLESS",
+                        "MQA"
+                    ]
+                },
+                "artists": [
+                    {
+                        "id": 5469318,
+                        "name": "Sekai No Owari",
+                        "type": "MAIN",
+                        "picture": "a4c644d2-7d4a-4c79-9f5a-96af5c09c988"
+                    }
+                ]
+            }
+        ]
+    },
+    "playlists": {
+        "limit": 10,
+        "offset": 0,
+        "totalNumberOfItems": 2,
+        "items": [
+            {
+                "uuid": "ebbddb7f-e2d6-43c0-8b1e-2adcfcaff714",
+                "title": "Kuchnia Japo\u0144ska",
+                "numberOfTracks": 18,
+                "numberOfVideos": 0,
+                "creator": {
+                    "id": 18512710,
+                    "name": "Digster Polska",
+                    "artistTypes": null,
+                    "url": null,
+                    "picture": "6664e1c8-d4b7-4819-9f8b-e63fa829a629",
+                    "popularity": 0,
+                    "artistRoles": null,
+                    "mixes": null
+                },
+                "description": "Ty m\u00f3wisz \u201ePa pa\u201d - my m\u00f3wimy \u201e(Sayo)Nara\u201d (foto: Digster) ",
+                "duration": 6009,
+                "lastUpdated": "2020-04-06T09:45:42.000+0000",
+                "created": "2020-04-06T09:26:22.000+0000",
+                "type": "ARTIST",
+                "publicPlaylist": true,
+                "url": "http://www.tidal.com/playlist/ebbddb7f-e2d6-43c0-8b1e-2adcfcaff714",
+                "image": "2127735f-516d-4412-ace5-2082d6f6a7ad",
+                "popularity": 0,
+                "squareImage": "fface3d7-485e-4712-9749-a06240ad0c9d",
+                "promotedArtists": [],
+                "lastItemAddedAt": "2020-04-06T09:26:22.000+0000"
+            },
+            {
+                "uuid": "db198ef1-54fe-49ce-a437-114a1896b1a1",
+                "title": "Waypoint",
+                "numberOfTracks": 80,
+                "numberOfVideos": 0,
+                "creator": {},
+                "description": "Set your waypoint and venture on with this selection of calm classical tracks.",
+                "duration": 28131,
+                "lastUpdated": "2022-07-18T14:14:08.000+0000",
+                "created": "2019-07-30T20:15:50.000+0000",
+                "type": "EDITORIAL",
+                "publicPlaylist": true,
+                "url": "http://www.tidal.com/playlist/db198ef1-54fe-49ce-a437-114a1896b1a1",
+                "image": "6c27a9b2-0714-413a-b137-0f9754dd7dff",
+                "popularity": 4,
+                "squareImage": "42fdc7b8-76e5-4a3b-bc5e-03db7acf5b77",
+                "promotedArtists": [
+                    {
+                        "id": 2935,
+                        "name": "Various Artists",
+                        "type": "MAIN",
+                        "picture": null
+                    },
+                    {
+                        "id": 3518859,
+                        "name": "MONO",
+                        "type": "MAIN",
+                        "picture": "f17a03a0-a7c0-4a5d-9627-3e9e1226848b"
+                    },
+                    {
+                        "id": 9091,
+                        "name": "M83",
+                        "type": "MAIN",
+                        "picture": "1e23d466-ffd0-45d7-b89d-f034cac087ee"
+                    },
+                    {
+                        "id": 8812,
+                        "name": "Coldplay",
+                        "type": "MAIN",
+                        "picture": "b4579672-5b91-4679-a27a-288f097a4da5"
+                    }
+                ],
+                "lastItemAddedAt": null
+            }
+        ]
+    },
+    "tracks": {
+        "limit": 10,
+        "offset": 0,
+        "totalNumberOfItems": 300,
+        "items": [
+            {
+                "id": 225720085,
+                "title": "Habit",
+                "duration": 253,
+                "replayGain": -9.62,
+                "peak": 0.987408,
+                "allowStreaming": true,
+                "streamReady": true,
+                "adSupportedStreamReady": true,
+                "djReady": true,
+                "stemReady": false,
+                "streamStartDate": "2022-04-28T00:00:00.000+0000",
+                "premiumStreamingOnly": false,
+                "trackNumber": 1,
+                "volumeNumber": 1,
+                "version": null,
+                "popularity": 36,
+                "copyright": "A Virgin Music release; \u2117 2022 UNIVERSAL MUSIC LLC",
+                "bpm": null,
+                "url": "http://www.tidal.com/track/225720085",
+                "isrc": "JPPO02201022",
+                "editable": false,
+                "explicit": false,
+                "audioQuality": "HI_RES",
+                "audioModes": [
+                    "STEREO"
+                ],
+                "mediaMetadata": {
+                    "tags": [
+                        "LOSSLESS",
+                        "HIRES_LOSSLESS",
+                        "MQA"
+                    ]
+                },
+                "artists": [
+                    {
+                        "id": 5469318,
+                        "name": "Sekai No Owari",
+                        "type": "MAIN",
+                        "picture": "a4c644d2-7d4a-4c79-9f5a-96af5c09c988"
+                    }
+                ],
+                "album": {
+                    "id": 225720082,
+                    "title": "Habit",
+                    "cover": "797516dc-8911-471d-b763-f60aae3266c0",
+                    "vibrantColor": "#FFFFFF",
+                    "videoCover": null,
+                    "releaseDate": "2022-04-15"
+                },
+                "mixes": {
+                    "TRACK_MIX": "00144074a8e8e36185efb7f34b5561"
+                }
+            },
+            {
+                "id": 315591844,
+                "title": "The Peak",
+                "duration": 227,
+                "replayGain": -10.92,
+                "peak": 0.987396,
+                "allowStreaming": true,
+                "streamReady": true,
+                "adSupportedStreamReady": true,
+                "djReady": true,
+                "stemReady": false,
+                "streamStartDate": "2023-09-17T00:00:00.000+0000",
+                "premiumStreamingOnly": false,
+                "trackNumber": 1,
+                "volumeNumber": 1,
+                "version": null,
+                "popularity": 22,
+                "copyright": "A Virgin Music release; \u2117 2023 UNIVERSAL MUSIC LLC",
+                "bpm": null,
+                "url": "http://www.tidal.com/track/315591844",
+                "isrc": "JPPO02303117",
+                "editable": false,
+                "explicit": false,
+                "audioQuality": "LOSSLESS",
+                "audioModes": [
+                    "STEREO"
+                ],
+                "mediaMetadata": {
+                    "tags": [
+                        "LOSSLESS"
+                    ]
+                },
+                "artists": [
+                    {
+                        "id": 5469318,
+                        "name": "Sekai No Owari",
+                        "type": "MAIN",
+                        "picture": "a4c644d2-7d4a-4c79-9f5a-96af5c09c988"
+                    }
+                ],
+                "album": {
+                    "id": 315591843,
+                    "title": "The Peak",
+                    "cover": "b50ee10a-7483-4d3a-be76-08c609f1f3da",
+                    "vibrantColor": "#6bccc0",
+                    "videoCover": null,
+                    "releaseDate": "2023-09-17"
+                },
+                "mixes": {
+                    "TRACK_MIX": "001e425aad620b9388ed9695249656"
+                }
+            },
+            {
+                "id": 355274490,
+                "title": "tears",
+                "duration": 224,
+                "replayGain": -11.56,
+                "peak": 0.977203,
+                "allowStreaming": true,
+                "streamReady": true,
+                "adSupportedStreamReady": true,
+                "djReady": true,
+                "stemReady": false,
+                "streamStartDate": "2024-04-05T00:00:00.000+0000",
+                "premiumStreamingOnly": false,
+                "trackNumber": 6,
+                "volumeNumber": 1,
+                "version": null,
+                "popularity": 19,
+                "copyright": "A Virgin Music release; \u2117 2021 UNIVERSAL MUSIC LLC",
+                "bpm": null,
+                "url": "http://www.tidal.com/track/355274490",
+                "isrc": "JPPO02102134",
+                "editable": false,
+                "explicit": false,
+                "audioQuality": "LOSSLESS",
+                "audioModes": [
+                    "STEREO"
+                ],
+                "mediaMetadata": {
+                    "tags": [
+                        "LOSSLESS"
+                    ]
+                },
+                "artists": [
+                    {
+                        "id": 5469318,
+                        "name": "Sekai No Owari",
+                        "type": "MAIN",
+                        "picture": "a4c644d2-7d4a-4c79-9f5a-96af5c09c988"
+                    }
+                ],
+                "album": {
+                    "id": 355274484,
+                    "title": "\u6625\u306e\u591c\u306b\u8074\u304d\u305f\u304f\u306a\u308bJ-POP",
+                    "cover": "563191ca-b7a3-4f28-b159-d99a148d8f43",
+                    "vibrantColor": "#fbb6ab",
+                    "videoCover": null,
+                    "releaseDate": "2024-04-05"
+                },
+                "mixes": {
+                    "TRACK_MIX": "001c831d2c381a54ab88152545d2c5"
+                }
+            },
+            {
+                "id": 35722136,
+                "title": "Tokyo",
+                "duration": 220,
+                "replayGain": -10.42,
+                "peak": 0.999969,
+                "allowStreaming": true,
+                "streamReady": true,
+                "adSupportedStreamReady": true,
+                "djReady": true,
+                "stemReady": false,
+                "streamStartDate": "2014-10-07T00:00:00.000+0000",
+                "premiumStreamingOnly": false,
+                "trackNumber": 1,
+                "volumeNumber": 1,
+                "version": null,
+                "popularity": 14,
+                "copyright": "\u2117 2014 Republic Records, a division of UMG Recordings, Inc.",
+                "bpm": null,
+                "url": "http://www.tidal.com/track/35722136",
+                "isrc": "USUM71414526",
+                "editable": false,
+                "explicit": false,
+                "audioQuality": "LOSSLESS",
+                "audioModes": [
+                    "STEREO"
+                ],
+                "mediaMetadata": {
+                    "tags": [
+                        "LOSSLESS"
+                    ]
+                },
+                "artists": [
+                    {
+                        "id": 3582596,
+                        "name": "Owl City",
+                        "type": "MAIN",
+                        "picture": "8ee4453f-70da-4e87-9cc2-88de73f76bb8"
+                    },
+                    {
+                        "id": 5469318,
+                        "name": "Sekai No Owari",
+                        "type": "FEATURED",
+                        "picture": "a4c644d2-7d4a-4c79-9f5a-96af5c09c988"
+                    }
+                ],
+                "album": {
+                    "id": 35722135,
+                    "title": "Tokyo",
+                    "cover": "80f4c9ab-665a-42df-90f3-06ae7aaaaa64",
+                    "vibrantColor": "#a3c9e5",
+                    "videoCover": null,
+                    "releaseDate": "2014-10-07"
+                },
+                "mixes": {
+                    "TRACK_MIX": "001783e161f28a59bb0ddae931cf65"
+                }
+            },
+            {
+                "id": 158478798,
+                "title": "silent",
+                "duration": 309,
+                "replayGain": -10.0,
+                "peak": 0.966034,
+                "allowStreaming": true,
+                "streamReady": true,
+                "adSupportedStreamReady": true,
+                "djReady": true,
+                "stemReady": false,
+                "streamStartDate": "2020-10-21T00:00:00.000+0000",
+                "premiumStreamingOnly": false,
+                "trackNumber": 1,
+                "volumeNumber": 1,
+                "version": null,
+                "popularity": 13,
+                "copyright": "A Virgin Music release; \u2117 2020 UNIVERSAL MUSIC LLC",
+                "bpm": null,
+                "url": "http://www.tidal.com/track/158478798",
+                "isrc": "JPPO02003244",
+                "editable": false,
+                "explicit": false,
+                "audioQuality": "LOSSLESS",
+                "audioModes": [
+                    "STEREO"
+                ],
+                "mediaMetadata": {
+                    "tags": [
+                        "LOSSLESS"
+                    ]
+                },
+                "artists": [
+                    {
+                        "id": 5469318,
+                        "name": "Sekai No Owari",
+                        "type": "MAIN",
+                        "picture": "a4c644d2-7d4a-4c79-9f5a-96af5c09c988"
+                    }
+                ],
+                "album": {
+                    "id": 158478797,
+                    "title": "silent",
+                    "cover": "75d5375f-46a3-4c27-b915-6988f6376281",
+                    "vibrantColor": "#f6ef70",
+                    "videoCover": null,
+                    "releaseDate": "2020-10-21"
+                },
+                "mixes": {
+                    "TRACK_MIX": "001b1a7ad37e4e0e03ba051f8b1c13"
+                }
+            },
+            {
+                "id": 188982336,
+                "title": "tears",
+                "duration": 224,
+                "replayGain": -8.91,
+                "peak": 0.977203,
+                "allowStreaming": true,
+                "streamReady": true,
+                "adSupportedStreamReady": true,
+                "djReady": true,
+                "stemReady": false,
+                "streamStartDate": "2021-07-02T00:00:00.000+0000",
+                "premiumStreamingOnly": false,
+                "trackNumber": 1,
+                "volumeNumber": 1,
+                "version": null,
+                "popularity": 12,
+                "copyright": "A Virgin Music release; \u2117 2021 UNIVERSAL MUSIC LLC",
+                "bpm": null,
+                "url": "http://www.tidal.com/track/188982336",
+                "isrc": "JPPO02102134",
+                "editable": false,
+                "explicit": false,
+                "audioQuality": "LOSSLESS",
+                "audioModes": [
+                    "STEREO"
+                ],
+                "mediaMetadata": {
+                    "tags": [
+                        "LOSSLESS"
+                    ]
+                },
+                "artists": [
+                    {
+                        "id": 5469318,
+                        "name": "Sekai No Owari",
+                        "type": "MAIN",
+                        "picture": "a4c644d2-7d4a-4c79-9f5a-96af5c09c988"
+                    }
+                ],
+                "album": {
+                    "id": 188982335,
+                    "title": "tears",
+                    "cover": "b0f79cef-7677-4b76-bfbf-c70ce52bb1fd",
+                    "vibrantColor": "#c9b55c",
+                    "videoCover": null,
+                    "releaseDate": "2021-07-02"
+                },
+                "mixes": {
+                    "TRACK_MIX": "00122216309751d74b6bae9b084b60"
+                }
+            },
+            {
+                "id": 142667132,
+                "title": "umbrella",
+                "duration": 277,
+                "replayGain": -10.1,
+                "peak": 0.99884,
+                "allowStreaming": true,
+                "streamReady": true,
+                "adSupportedStreamReady": true,
+                "djReady": true,
+                "stemReady": false,
+                "streamStartDate": "2020-06-01T00:00:00.000+0000",
+                "premiumStreamingOnly": false,
+                "trackNumber": 1,
+                "volumeNumber": 1,
+                "version": null,
+                "popularity": 11,
+                "copyright": "A Virgin Music release; \u2117 2020 UNIVERSAL MUSIC LLC",
+                "bpm": null,
+                "url": "http://www.tidal.com/track/142667132",
+                "isrc": "JPPO02001322",
+                "editable": false,
+                "explicit": false,
+                "audioQuality": "LOSSLESS",
+                "audioModes": [
+                    "STEREO"
+                ],
+                "mediaMetadata": {
+                    "tags": [
+                        "LOSSLESS"
+                    ]
+                },
+                "artists": [
+                    {
+                        "id": 5469318,
+                        "name": "Sekai No Owari",
+                        "type": "MAIN",
+                        "picture": "a4c644d2-7d4a-4c79-9f5a-96af5c09c988"
+                    }
+                ],
+                "album": {
+                    "id": 142667131,
+                    "title": "umbrella",
+                    "cover": "e039e327-05b1-418b-ad58-0fc31ca39d15",
+                    "vibrantColor": "#92cff1",
+                    "videoCover": null,
+                    "releaseDate": "2020-06-01"
+                },
+                "mixes": {
+                    "TRACK_MIX": "0011ef1a0bce5fe48d1fdcccbe3a0e"
+                }
+            },
+            {
+                "id": 208040418,
+                "title": "Diary",
+                "duration": 243,
+                "replayGain": -9.61,
+                "peak": 0.987408,
+                "allowStreaming": true,
+                "streamReady": true,
+                "adSupportedStreamReady": true,
+                "djReady": true,
+                "stemReady": false,
+                "streamStartDate": "2021-12-14T00:00:00.000+0000",
+                "premiumStreamingOnly": false,
+                "trackNumber": 1,
+                "volumeNumber": 1,
+                "version": null,
+                "popularity": 11,
+                "copyright": "A Virgin Music release; \u2117 2021 UNIVERSAL MUSIC LLC",
+                "bpm": null,
+                "url": "http://www.tidal.com/track/208040418",
+                "isrc": "JPPO02104271",
+                "editable": false,
+                "explicit": false,
+                "audioQuality": "HI_RES",
+                "audioModes": [
+                    "STEREO"
+                ],
+                "mediaMetadata": {
+                    "tags": [
+                        "LOSSLESS",
+                        "HIRES_LOSSLESS",
+                        "MQA"
+                    ]
+                },
+                "artists": [
+                    {
+                        "id": 5469318,
+                        "name": "Sekai No Owari",
+                        "type": "MAIN",
+                        "picture": "a4c644d2-7d4a-4c79-9f5a-96af5c09c988"
+                    }
+                ],
+                "album": {
+                    "id": 208040417,
+                    "title": "Diary",
+                    "cover": "ed030958-fd74-4797-939d-21e52f2863a2",
+                    "vibrantColor": "#e3c363",
+                    "videoCover": null,
+                    "releaseDate": "2022-01-24"
+                },
+                "mixes": {
+                    "TRACK_MIX": "0016b4ce1e2e99747dcb30446e539a"
+                }
+            },
+            {
+                "id": 315591846,
+                "title": "The Peak",
+                "duration": 227,
+                "replayGain": -11.22,
+                "peak": 0.987407,
+                "allowStreaming": true,
+                "streamReady": true,
+                "adSupportedStreamReady": true,
+                "djReady": true,
+                "stemReady": false,
+                "streamStartDate": "2023-09-17T00:00:00.000+0000",
+                "premiumStreamingOnly": false,
+                "trackNumber": 1,
+                "volumeNumber": 1,
+                "version": null,
+                "popularity": 10,
+                "copyright": "A Virgin Music release; \u2117 2023 UNIVERSAL MUSIC LLC",
+                "bpm": null,
+                "url": "http://www.tidal.com/track/315591846",
+                "isrc": "JPPO02303117",
+                "editable": false,
+                "explicit": false,
+                "audioQuality": "HI_RES",
+                "audioModes": [
+                    "STEREO"
+                ],
+                "mediaMetadata": {
+                    "tags": [
+                        "LOSSLESS",
+                        "HIRES_LOSSLESS",
+                        "MQA"
+                    ]
+                },
+                "artists": [
+                    {
+                        "id": 5469318,
+                        "name": "Sekai No Owari",
+                        "type": "MAIN",
+                        "picture": "a4c644d2-7d4a-4c79-9f5a-96af5c09c988"
+                    }
+                ],
+                "album": {
+                    "id": 315591845,
+                    "title": "The Peak",
+                    "cover": "17e8ee1b-a4e6-4d79-b05d-30077b5220eb",
+                    "vibrantColor": "#6bccc0",
+                    "videoCover": null,
+                    "releaseDate": "2023-09-17"
+                },
+                "mixes": {
+                    "TRACK_MIX": "001e2546281423e3c1b16078e26920"
+                }
+            },
+            {
+                "id": 135358900,
+                "title": "Dropout",
+                "duration": 241,
+                "replayGain": -10.53,
+                "peak": 0.99884,
+                "allowStreaming": true,
+                "streamReady": true,
+                "adSupportedStreamReady": true,
+                "djReady": true,
+                "stemReady": false,
+                "streamStartDate": "2020-03-31T00:00:00.000+0000",
+                "premiumStreamingOnly": false,
+                "trackNumber": 1,
+                "volumeNumber": 1,
+                "version": null,
+                "popularity": 10,
+                "copyright": "A Virgin Music release; \u2117 2020 UNIVERSAL MUSIC LLC",
+                "bpm": null,
+                "url": "http://www.tidal.com/track/135358900",
+                "isrc": "JPPO02001113",
+                "editable": false,
+                "explicit": false,
+                "audioQuality": "LOSSLESS",
+                "audioModes": [
+                    "STEREO"
+                ],
+                "mediaMetadata": {
+                    "tags": [
+                        "LOSSLESS"
+                    ]
+                },
+                "artists": [
+                    {
+                        "id": 5469318,
+                        "name": "Sekai No Owari",
+                        "type": "MAIN",
+                        "picture": "a4c644d2-7d4a-4c79-9f5a-96af5c09c988"
+                    }
+                ],
+                "album": {
+                    "id": 135358899,
+                    "title": "Dropout",
+                    "cover": "e0420df0-546e-407c-af5f-18a76fc37803",
+                    "vibrantColor": "#bf2f51",
+                    "videoCover": null,
+                    "releaseDate": "2020-03-31"
+                },
+                "mixes": {
+                    "TRACK_MIX": "0018029a9bbfd6e02f951792b5c496"
+                }
+            }
+        ]
+    },
+    "videos": {
+        "limit": 10,
+        "offset": 0,
+        "totalNumberOfItems": 0,
+        "items": []
+    },
+    "topHit": {
+        "value": {
+            "id": 5469318,
+            "name": "Sekai No Owari",
+            "artistTypes": [
+                "ARTIST",
+                "CONTRIBUTOR"
+            ],
+            "url": "http://www.tidal.com/artist/5469318",
+            "picture": "a4c644d2-7d4a-4c79-9f5a-96af5c09c988",
+            "popularity": 40,
+            "artistRoles": [
+                {
+                    "categoryId": -1,
+                    "category": "Artist"
+                },
+                {
+                    "categoryId": 10,
+                    "category": "Production team"
+                },
+                {
+                    "categoryId": 1,
+                    "category": "Producer"
+                },
+                {
+                    "categoryId": 11,
+                    "category": "Performer"
+                },
+                {
+                    "categoryId": 2,
+                    "category": "Songwriter"
+                },
+                {
+                    "categoryId": 3,
+                    "category": "Engineer"
+                }
+            ],
+            "mixes": {
+                "ARTIST_MIX": "000d296273af34f133b013692b1daa"
+            }
+        },
+        "type": "ARTISTS"
+    }
+}

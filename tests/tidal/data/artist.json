@@ -1,0 +1,40 @@
+{
+    "id": 5469318,
+    "name": "Sekai No Owari",
+    "artistTypes": [
+        "ARTIST",
+        "CONTRIBUTOR"
+    ],
+    "url": "http://www.tidal.com/artist/5469318",
+    "picture": "a4c644d2-7d4a-4c79-9f5a-96af5c09c988",
+    "popularity": 40,
+    "artistRoles": [
+        {
+            "categoryId": -1,
+            "category": "Artist"
+        },
+        {
+            "categoryId": 10,
+            "category": "Production team"
+        },
+        {
+            "categoryId": 1,
+            "category": "Producer"
+        },
+        {
+            "categoryId": 11,
+            "category": "Performer"
+        },
+        {
+            "categoryId": 2,
+            "category": "Songwriter"
+        },
+        {
+            "categoryId": 3,
+            "category": "Engineer"
+        }
+    ],
+    "mixes": {
+        "ARTIST_MIX": "000d296273af34f133b013692b1daa"
+    }
+}

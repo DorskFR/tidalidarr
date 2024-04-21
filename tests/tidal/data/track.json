@@ -1,0 +1,54 @@
+{
+    "id": 225720085,
+    "title": "Habit",
+    "duration": 253,
+    "replayGain": -9.62,
+    "peak": 0.987408,
+    "allowStreaming": true,
+    "streamReady": true,
+    "adSupportedStreamReady": true,
+    "djReady": true,
+    "stemReady": false,
+    "streamStartDate": "2022-04-28T00:00:00.000+0000",
+    "premiumStreamingOnly": false,
+    "trackNumber": 1,
+    "volumeNumber": 1,
+    "version": null,
+    "popularity": 36,
+    "copyright": "A Virgin Music release; \u2117 2022 UNIVERSAL MUSIC LLC",
+    "bpm": null,
+    "url": "http://www.tidal.com/track/225720085",
+    "isrc": "JPPO02201022",
+    "editable": false,
+    "explicit": false,
+    "audioQuality": "HI_RES",
+    "audioModes": [
+        "STEREO"
+    ],
+    "mediaMetadata": {
+        "tags": [
+            "LOSSLESS",
+            "HIRES_LOSSLESS",
+            "MQA"
+        ]
+    },
+    "artists": [
+        {
+            "id": 5469318,
+            "name": "Sekai No Owari",
+            "type": "MAIN",
+            "picture": "a4c644d2-7d4a-4c79-9f5a-96af5c09c988"
+        }
+    ],
+    "album": {
+        "id": 225720082,
+        "title": "Habit",
+        "cover": "797516dc-8911-471d-b763-f60aae3266c0",
+        "vibrantColor": "#FFFFFF",
+        "videoCover": null,
+        "releaseDate": "2022-04-15"
+    },
+    "mixes": {
+        "TRACK_MIX": "00144074a8e8e36185efb7f34b5561"
+    }
+}
