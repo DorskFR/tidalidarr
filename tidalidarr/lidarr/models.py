@@ -28,8 +28,8 @@ class LidarrMissingTrack(LidarrModel):
     disable_release_switching: bool = False
 
     @model_validator(mode="before")
-    @classmethod
-    def extract_items(cls, values: dict[str, Any]) -> dict[str, Any]:
+    @staticmethod
+    def extract_items(values: dict[str, Any]) -> dict[str, Any]:
         values["artistId"] = values["artist"]["id"]
         values["albumId"] = values["album"]["id"]
         values["trackIds"] = [track["id"] for track in values["tracks"]]

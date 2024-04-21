@@ -22,6 +22,7 @@ lint:
 	$(PYTHON) -m ruff check ./$(APP) $(TESTS)
 	$(PYTHON) -m ruff format --check ./$(APP) $(TESTS)
 	$(PYTHON) -m mypy --cache-dir .cache/mypy_cache ./$(APP) $(TESTS)
+	$(PYTHON) -m vulture --min-confidence=100 ./$(APP) $(TESTS)
 
 lint/fix:
 	$(PYTHON) -m ruff check --fix-only ./$(APP) $(TESTS)

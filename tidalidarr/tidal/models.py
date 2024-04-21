@@ -4,7 +4,7 @@ from datetime import date
 from enum import StrEnum
 from functools import cached_property
 from pathlib import Path
-from typing import Any, Generic, Literal, TypedDict, TypeVar
+from typing import Any, Literal, TypeVar
 from uuid import UUID
 
 import mutagen
@@ -17,7 +17,6 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 #
 # Constants
 #
-
 USER_AGENT = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
 )
@@ -27,11 +26,10 @@ USER_AGENT = (
 #
 T = TypeVar("T")
 
+
 #
 # Errors
 #
-
-
 class TidalLoginFailedError(Exception):
     """Raised when logging in failed"""
 
@@ -39,8 +37,6 @@ class TidalLoginFailedError(Exception):
 #
 # Enums
 #
-
-
 class AudioQuality(StrEnum):
     HI_RES = "HI_RES"
     HIGH = "HIGH"
@@ -66,8 +62,6 @@ class AudioMode(StrEnum):
 #
 # Models
 #
-
-
 class TidalConfig(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="tidal_")
 
@@ -254,13 +248,6 @@ class TidalStream(TidalModel):
         return next(iter(self.decoded_manifest.urls))
 
 
-class SearchCategory(TypedDict, Generic[T]):
-    limit: int
-    offset: int
-    total_number_of_items: int
-    items: list[T]
-
-
 class TidalSearchResult(TidalModel):
     artists: list[TidalArtist]
     albums: list[TidalAlbum]
@@ -268,8 +255,8 @@ class TidalSearchResult(TidalModel):
     top_hit: dict[str, Any] | None
 
     @model_validator(mode="before")
-    @classmethod
-    def extract_items(cls, values: dict[str, Any]) -> dict[str, Any]:
+    @staticmethod
+    def extract_items(values: dict[str, Any]) -> dict[str, Any]:
         values["artists"] = values.get("artists", {}).get("items", [])
         values["albums"] = values.get("albums", {}).get("items", [])
         values["tracks"] = values.get("tracks", {}).get("items", [])
