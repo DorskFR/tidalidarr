@@ -2,7 +2,7 @@
 PYTHON ?= ./venv/bin/python
 APP ?= tidalidarr
 TESTS ?= tests
-REPOSITORY_URL ?= registry.localhost/localhost/tidalidarr
+REPOSITORY_URL ?= ghcr.io/dorskfr/$(APP)
 IMAGE_TAG ?= latest
 
 setup:
