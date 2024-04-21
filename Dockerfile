@@ -1,13 +1,13 @@
-ARG PYTHON_VERSION
+ARG PYTHON_VERSION=3.12
 FROM python:${PYTHON_VERSION}-slim AS build
 WORKDIR /build
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 FROM python:${PYTHON_VERSION}-slim AS runner
-ARG PYTHON_VERSION
-ARG VERSION
-ARG PROJECT_NAME
+ARG PYTHON_VERSION=3.12
+ARG VERSION=latest
+ARG PROJECT_NAME=tidalidarr
 WORKDIR /usr/src/app
 COPY --from=build /usr/local/lib/python${PYTHON_VERSION}/site-packages/ /usr/local/lib/python${PYTHON_VERSION}/site-packages/
 COPY $PROJECT_NAME $PROJECT_NAME

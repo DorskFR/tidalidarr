@@ -1,0 +1,5 @@
+# This is a comment.
+# The following line will match any file in the repository and
+# automatically request a review from the specified team when a PR is opened.
+
+* @DorskFR
