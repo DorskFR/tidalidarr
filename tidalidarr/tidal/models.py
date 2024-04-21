@@ -152,6 +152,37 @@ class TidalAlbum(TidalAlbumStub):
         ]
 
 
+class TidalStreamManifest(TidalModel):
+    mime_type: str
+    codecs: str
+    encryption_type: str
+    urls: list[HttpUrl]
+
+
+class TidalStream(TidalModel):
+    track_id: int
+    asset_presentation: AssetPresentation
+    audio_mode: AudioMode
+    audio_quality: AudioQuality
+    manifest_mime_type: str
+    manifest_hash: str
+    manifest: str
+    album_replay_gain: float | None
+    album_peak_amplitude: float | None
+    track_replay_gain: float | None
+    track_peak_amplitude: float | None
+    bit_depth: int | None
+    sample_rate: int | None
+
+    @cached_property
+    def decoded_manifest(self) -> TidalStreamManifest:
+        return TidalStreamManifest(**json.loads(base64.b64decode(self.manifest).decode("utf-8")))
+
+    @cached_property
+    def url(self) -> HttpUrl:
+        return next(iter(self.decoded_manifest.urls))
+
+
 class TidalTrack(TidalModel):
     id: int
     title: str
@@ -183,6 +214,7 @@ class TidalTrack(TidalModel):
     def save_metadata(
         self,
         album: TidalAlbum,
+        stream: TidalStream,
         filename: str,
         cover_bytes: bytes | None = None,
         lyrics: str | None = None,
@@ -200,8 +232,12 @@ class TidalTrack(TidalModel):
         metadata.tags["tracktotal"] = str(album.number_of_tracks)
         metadata.tags["date"] = album.release_date_str
         metadata.tags["isrc"] = self.isrc
-        metadata.tags["replaygain_track_gain"] = f"{self.replay_gain:.8f} dB"
-        metadata.tags["replaygain_track_peak"] = f"{self.peak:.8f}"
+        metadata.tags["replaygain_track_gain"] = f"{(self.replay_gain or stream.track_replay_gain):.8f} dB"
+        metadata.tags["replaygain_track_peak"] = f"{self.peak or stream.track_peak_amplitude:.8f}"
+        if stream.album_replay_gain:
+            metadata.tags["replaygain_album_gain"] = f"{stream.album_replay_gain:.8f} dB"
+        if stream.album_peak_amplitude:
+            metadata.tags["replaygain_album_peak"] = f"{stream.album_peak_amplitude:.8f}"
 
         if cover_bytes:
             flac_cover = mutagen.flac.Picture()
@@ -215,37 +251,6 @@ class TidalTrack(TidalModel):
             metadata.tags["lyrics"] = lyrics
 
         metadata.save()
-
-
-class TidalStreamManifest(TidalModel):
-    mime_type: str
-    codecs: str
-    encryption_type: str
-    urls: list[HttpUrl]
-
-
-class TidalStream(TidalModel):
-    track_id: int
-    asset_presentation: AssetPresentation
-    audio_mode: AudioMode
-    audio_quality: AudioQuality
-    manifest_mime_type: str
-    manifest_hash: str
-    manifest: str
-    album_replay_gain: float
-    album_peak_amplitude: float
-    track_replay_gain: float
-    track_peak_amplitude: float
-    bit_depth: int
-    sample_rate: int
-
-    @cached_property
-    def decoded_manifest(self) -> TidalStreamManifest:
-        return TidalStreamManifest(**json.loads(base64.b64decode(self.manifest).decode("utf-8")))
-
-    @cached_property
-    def url(self) -> HttpUrl:
-        return next(iter(self.decoded_manifest.urls))
 
 
 class TidalSearchResult(TidalModel):
