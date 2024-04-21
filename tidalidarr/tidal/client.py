@@ -99,7 +99,7 @@ class TidalClient:
         track_list = self.get_track_list(album)
         for track in track_list:
             track_stream = self.get_track_stream(track.id)
-            self.download_track(album, track, track_stream.url)
+            self.download_track(album, track, track_stream)
         logger.info(f"Finished downloading album: {album.title}")
 
     def get_track_list(self, album: TidalAlbum) -> list[TidalTrack]:
@@ -138,7 +138,7 @@ class TidalClient:
             lyrics = self._authenticated_request(lyrics_url, params).json()["lyrics"]
         return lyrics
 
-    def download_track(self, album: TidalAlbum, track: TidalTrack, track_url: HttpUrl) -> None:
+    def download_track(self, album: TidalAlbum, track: TidalTrack, track_stream: TidalStream) -> None:
         """
         Download logic:
         - Prepare the path (noop if exists)
@@ -158,13 +158,13 @@ class TidalClient:
         file_path.relative_to(folder)
 
         logger.info(f"Now downloading: {track.name}")
-        track_bytes = self._request(track_url).content
+        track_bytes = self._request(track_stream.url).content
         lyrics: str | None = self.get_track_lyrics(track.id)
 
         with tempfile.NamedTemporaryFile() as temp_file:
             temp_file.write(track_bytes)
             temp_file.flush()
-            track.save_metadata(album, temp_file.name, album.cover_bytes, lyrics)
+            track.save_metadata(album, track_stream, temp_file.name, album.cover_bytes, lyrics)
             shutil.move(temp_file.name, file_path)
             logger.info(f"Saved {file_path}")
 
