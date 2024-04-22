@@ -173,3 +173,7 @@ make docker/build
 make docker/push
 make docker/run
 ```
+
+## Disclaimer
+
+Use responsibly and solely for private purposes. A Tidal subscription is required. Redistribution or piracy of music is prohibited. `Tidal` is a trademark of its respective owner. For terms, see https://tidal.com/terms.
