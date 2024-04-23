@@ -1,7 +1,9 @@
 import logging
+import os
 import time
 
 import requests
+import sentry_sdk
 
 from tidalidarr.lidarr.client import LidarrClient, LidarrConfig
 from tidalidarr.tidal.client import TidalClient
@@ -28,4 +30,12 @@ def main() -> None:
 
 
 if __name__ == "__main__":
+    sentry_sdk.init(
+        dsn=os.getenv("SENTRY_DSN"),
+        release=f"tidalidarr@v{os.getenv('IMAGE_VERSION', 'latest')}",
+        environment=os.getenv("SENTRY_ENVIRONMENT", "development"),
+        sample_rate=1.0,
+        enable_tracing=True,
+        traces_sample_rate=1.0,
+    )
     main()

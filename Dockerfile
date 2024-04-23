@@ -8,6 +8,7 @@ FROM python:${PYTHON_VERSION}-slim AS runner
 ARG PYTHON_VERSION=3.12
 ARG VERSION=latest
 ARG PROJECT_NAME=tidalidarr
+ENV IMAGE_VERSION=${VERSION}
 WORKDIR /usr/src/app
 COPY --from=build /usr/local/lib/python${PYTHON_VERSION}/site-packages/ /usr/local/lib/python${PYTHON_VERSION}/site-packages/
 COPY $PROJECT_NAME $PROJECT_NAME
