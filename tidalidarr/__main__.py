@@ -8,6 +8,7 @@ import sentry_sdk
 from tidalidarr.lidarr.client import LidarrClient, LidarrConfig
 from tidalidarr.tidal.client import TidalClient
 from tidalidarr.tidal.models import TidalConfig
+from tidalidarr.utils import contains_japanese, romanize
 
 logging.basicConfig(level="INFO", format="%(message)s", datefmt="[%X]")
 logger = logging.getLogger(__name__)
@@ -21,7 +22,9 @@ def main() -> None:
         while True:
             for query in lidarr_client.get_missing_albums():
                 lidarr_client.cleanup_download_folder()
-                if path := tidal_client.search(query):
+                path = tidal_client.search(query)
+                path = path or tidal_client.search(romanize(query)) if contains_japanese(query) else None
+                if path:
                     lidarr_client.manual_import(path)
                     lidarr_client.trigger_import(path)
 
