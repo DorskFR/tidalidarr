@@ -4,7 +4,7 @@ from datetime import date
 from enum import StrEnum
 from functools import cached_property
 from pathlib import Path
-from typing import Any, Literal, TypeVar
+from typing import Any, Literal
 from uuid import UUID
 
 import mutagen
@@ -20,11 +20,6 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 USER_AGENT = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
 )
-
-#
-# Types
-#
-T = TypeVar("T")
 
 
 #

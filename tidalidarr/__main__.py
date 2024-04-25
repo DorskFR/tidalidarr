@@ -10,7 +10,7 @@ from tidalidarr.tidal.client import TidalClient
 from tidalidarr.tidal.models import TidalConfig
 from tidalidarr.utils import contains_japanese, romanize
 
-logging.basicConfig(level="INFO", format="%(message)s", datefmt="[%X]")
+logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO"), format="%(levelname)s %(message)s")
 logger = logging.getLogger(__name__)
 
 

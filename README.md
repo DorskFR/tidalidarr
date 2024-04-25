@@ -22,7 +22,7 @@ The main variables that might require changes are:
 | `TIDAL_TOKEN_PATH`    | `No`     | token.json                   | Persistent storage to save the authentication token |
 | `LIDARR_API_URL`      | `Yes`    | http://127.0.0.1:8686/api/v1 | Lidarr API endpoint                                 |
 | `LIDARR_API_KEY`      | `Yes`    |                              | Lidarr API key                                      |
-
+| `LOG_LEVEL`           | `No`     |                              | Python log levels: DEBUG, INFO, WARNING, ERROR      |
 
 ### Docker (pull)
 

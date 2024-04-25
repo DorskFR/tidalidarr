@@ -61,11 +61,25 @@ class TidalClient:
         url = f"{self._config.api_hifi_url}/search"
         content = self._authenticated_request(url, params=params).json()
         result = TidalSearchResult(**content)
+        self._log_search_result(result)
+        return result
+
+    @staticmethod
+    def _log_search_result(result: TidalSearchResult) -> None:
         logger.info(
             f"Found: {len(result.artists)} artists and {len(result.albums)} albums "
             f"{'with' if result.top_hit else 'without'} a top hit."
         )
-        return result
+        if len(result.artists):
+            logger.debug("Artists:")
+            for artist in result.artists:
+                logger.debug(f"- {artist.name}")
+        if len(result.albums):
+            logger.debug("Albums:")
+            for album in result.albums:
+                logger.debug(f"- {album.title}")
+        if result.top_hit and result.top_hit_id:
+            logger.debug(f'Got a top hit of type {result.top_hit["type"]} with name {result.top_hit["value"]["name"]}')
 
     def search(self, query: str) -> Path | None:
         """
