@@ -79,7 +79,8 @@ class TidalClient:
             for album in result.albums:
                 logger.debug(f"- {album.title}")
         if result.top_hit and result.top_hit_id:
-            logger.debug(f'Got a top hit of type {result.top_hit["type"]} with name {result.top_hit["value"]["name"]}')
+            result_name = result.top_hit["value"].get("name") or result.top_hit["value"].get("title")
+            logger.debug(f'Got a top hit of type {result.top_hit["type"]} with name {result_name}')
 
     def search(self, query: str) -> Path | None:
         """
