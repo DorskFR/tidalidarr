@@ -20,9 +20,9 @@ logger = logging.getLogger(__name__)
 
 
 class LidarrClient:
-    def __init__(self, config: LidarrConfig, session: Session) -> None:
+    def __init__(self, config: LidarrConfig, session: Session | None = None) -> None:
         self._config = config
-        self._session = session
+        self._session = session or Session()
 
     @retry(
         wait=wait_fixed(30),

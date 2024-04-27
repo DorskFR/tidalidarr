@@ -2,6 +2,7 @@ import logging
 import shutil
 import tempfile
 import time
+from collections.abc import Iterator
 from contextlib import suppress
 from pathlib import Path
 from random import randrange
@@ -71,16 +72,16 @@ class TidalClient:
             f"{'with' if result.top_hit else 'without'} a top hit."
         )
         if len(result.artists):
-            logger.debug("Artists:")
+            logger.info("Artists:")
             for artist in result.artists:
-                logger.debug(f"- {artist.name}")
+                logger.info(f"- {artist.name}")
         if len(result.albums):
-            logger.debug("Albums:")
+            logger.info("Albums:")
             for album in result.albums:
-                logger.debug(f"- {album.title}")
+                logger.info(f"- {album.title}")
         if result.top_hit and result.top_hit_id:
             result_name = result.top_hit["value"].get("name") or result.top_hit["value"].get("title")
-            logger.debug(f'Got a top hit of type {result.top_hit["type"]} with name {result_name}')
+            logger.info(f'Got a top hit of type {result.top_hit["type"]} with name {result_name}')
 
     def search(self, query: str) -> Path | None:
         """
@@ -91,18 +92,27 @@ class TidalClient:
         """
         if query in self._not_found and (time.time() - self._not_found[query]) < self._config.check_interval:
             return None
+
         search_result = self._search(query)
         if not (album_id := search_result.top_hit_id):
             logging.warn(f"Could not find an album for: {query}")
             self._not_found[query] = time.time()
             return None
+
         if query in self._not_found:
             del self._not_found[query]
+
         album = next(a for a in search_result.albums if a.id == album_id)
         self.download_album(album)
         return album.folder
 
-    def download_album(self, album: TidalAlbum) -> None:
+    def find_album(self, album_id: int) -> TidalAlbum:
+        params = {"countryCode": self._config.country_code}
+        url = f"{self._config.api_hifi_url}/albums/{album_id}"
+        content = self._authenticated_request(url, params=params).json()
+        return TidalAlbum(**content)
+
+    def download_album(self, album: TidalAlbum) -> Iterator[str]:
         """
         Download an album from Tidal:
         - Download once the album cover (written to each track)
@@ -115,6 +125,7 @@ class TidalClient:
         for track in track_list:
             track_stream = self.get_track_stream(track.id)
             self.download_track(album, track, track_stream)
+            yield f"{track.track_number}/{album.number_of_tracks} {track.name}"
         logger.info(f"Finished downloading album: {album.title}")
 
     def get_track_list(self, album: TidalAlbum) -> list[TidalTrack]:
