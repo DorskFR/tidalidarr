@@ -1,21 +1,17 @@
+import asyncio
 import logging
 import shutil
 import tempfile
 import time
-from collections.abc import Iterator
+from collections.abc import AsyncIterator
 from contextlib import suppress
 from pathlib import Path
 from random import randrange
-from typing import Any
 
-from pydantic import HttpUrl
-from requests import Response, Session
-from requests.auth import AuthBase
-from requests.exceptions import HTTPError
+from aiohttp import ClientError, ClientSession
 
-from tidalidarr.tidal.auth import TidalAuth
+from tidalidarr.tidal.base_client import TidalBaseClient
 from tidalidarr.tidal.models import (
-    USER_AGENT,
     AssetPresentation,
     AudioQuality,
     PlaybackMode,
@@ -29,30 +25,12 @@ from tidalidarr.tidal.models import (
 logger = logging.getLogger(__name__)
 
 
-class TidalClient:
-    def __init__(self, config: TidalConfig, session: Session | None = None) -> None:
-        self._config = config
-        self._session = session or Session()
-        self._session.headers.update({"User-Agent": USER_AGENT})
-        self._auth = TidalAuth(self._config, self._session)
+class TidalClient(TidalBaseClient):
+    def __init__(self, config: TidalConfig, session: ClientSession) -> None:
+        super().__init__(config, session)
         self._not_found: dict[str, float] = {}
 
-    def _request(
-        self, url: HttpUrl | str, params: dict[str, Any] | None = None, auth: AuthBase | None = None
-    ) -> Response:
-        response = self._session.get(str(url), params=params, auth=auth, timeout=10)
-        response.raise_for_status()
-        time.sleep(1)  # TODO: cheap rate limit to avoid 429
-        return response
-
-    def _authenticated_request(self, url: HttpUrl | str, params: dict[str, Any] | None = None) -> Response:
-        return self._request(
-            url,
-            params={"countryCode": self._config.country_code} | (params or {}),
-            auth=self._auth,
-        )
-
-    def _search(self, query: str) -> TidalSearchResult:
+    async def _search(self, query: str) -> TidalSearchResult:
         """
         Trigger a search to Tidal's API using a query string built with Artist + release name
         If found, we return the search model with all the parsed fields.
@@ -60,7 +38,8 @@ class TidalClient:
         logger.info(f"Searching for: {query}")
         params = {"query": query, "countryCode": self._config.country_code}
         url = f"{self._config.api_hifi_url}/search"
-        content = self._authenticated_request(url, params=params).json()
+        resp = await self._request("GET", url, params=params, is_authenticated=True)
+        content = await resp.json()
         result = TidalSearchResult(**content)
         self._log_search_result(result)
         return result
@@ -83,7 +62,7 @@ class TidalClient:
             result_name = result.top_hit["value"].get("name") or result.top_hit["value"].get("title")
             logger.info(f'Got a top hit of type {result.top_hit["type"]} with name {result_name}')
 
-    def search(self, query: str) -> Path | None:
+    async def search(self, query: str) -> Path | None:
         """
         This function pilots the Tidal logic:
         - Search for a query string (filtering recent queries that failed)
@@ -93,7 +72,7 @@ class TidalClient:
         if query in self._not_found and (time.time() - self._not_found[query]) < self._config.check_interval:
             return None
 
-        search_result = self._search(query)
+        search_result = await self._search(query)
         if not (album_id := search_result.top_hit_id):
             logging.warn(f"Could not find an album for: {query}")
             self._not_found[query] = time.time()
@@ -103,16 +82,17 @@ class TidalClient:
             del self._not_found[query]
 
         album = next(a for a in search_result.albums if a.id == album_id)
-        self.download_album(album)
+        await self.download_album(album)
         return album.folder
 
-    def find_album(self, album_id: int) -> TidalAlbum:
+    async def find_album(self, album_id: int) -> TidalAlbum:
         params = {"countryCode": self._config.country_code}
         url = f"{self._config.api_hifi_url}/albums/{album_id}"
-        content = self._authenticated_request(url, params=params).json()
+        response = await self._request("GET", url, params=params, is_authenticated=True)
+        content = await response.json()
         return TidalAlbum(**content)
 
-    def download_album(self, album: TidalAlbum) -> Iterator[str]:
+    async def download_album(self, album: TidalAlbum) -> AsyncIterator[str]:
         """
         Download an album from Tidal:
         - Download once the album cover (written to each track)
@@ -122,54 +102,59 @@ class TidalClient:
         logger.info(f"Downloading album: {album.title}")
         yield f"Downloading album: {album.title}\n\n"
 
-        album.cover_bytes = self.get_album_cover(album)
-        track_list = self.get_track_list(album)
+        album.cover_bytes = await self.get_album_cover(album)
+        track_list = await self.get_track_list(album)
 
         for track in track_list:
-            track_stream = self.get_track_stream(track.id)
-            self.download_track(album, track, track_stream)
+            track_stream = await self.get_track_stream(track.id)
+            await self.download_track(album, track, track_stream)
             yield f"{track.track_number}/{album.number_of_tracks} {track.name}\n"
 
         logger.info(f"Finished downloading album: {album.title}")
         yield f"\nFinished downloading album: {album.title}\n"
 
-    def get_track_list(self, album: TidalAlbum) -> list[TidalTrack]:
+    async def get_track_list(self, album: TidalAlbum) -> list[TidalTrack]:
         url = f"{self._config.api_hifi_url}/albums/{album.id}/items"
-        content = self._authenticated_request(url, {"limit": 100}).json()["items"]
-        track_list = [TidalTrack(**item["item"]) for item in content]
+        response = await self._request("GET", url, params={"limit": 100}, is_authenticated=True)
+        content = await response.json()
+        track_list = [TidalTrack(**item["item"]) for item in content["items"]]
         logger.info(f"Album {album.title} ({album.id}) has {len(track_list)} tracks")
         return track_list
 
-    def get_album_cover(self, album: TidalAlbum) -> bytes | None:
+    async def get_album_cover(self, album: TidalAlbum) -> bytes | None:
         cover_bytes = None
         logger.info(f"Downloading a cover for: {album.title}")
         for cover_url in album.cover_urls:
-            with suppress(HTTPError):
-                cover_bytes = self._request(cover_url).content
+            with suppress(ClientError):
+                response = await self._request("GET", cover_url)
+                cover_bytes = await response.content.read()
                 logger.info(f"Finished downloading a cover for: {album.title}")
                 return cover_bytes
         logger.info(f"Could not find a cover for: {album.title}")
         return None
 
-    def get_track_stream(self, track_id: int) -> TidalStream:
+    async def get_track_stream(self, track_id: int) -> TidalStream:
         params = {
             "audioquality": AudioQuality.LOSSLESS,
             "playbackmode": PlaybackMode.STREAM,
             "assetpresentation": AssetPresentation.FULL,
         }
         url = f"{self._config.api_hifi_url}/tracks/{track_id}/playbackinfopostpaywall"
-        content = self._authenticated_request(url, params=params).json()
+        response = await self._request("GET", url, params=params)
+        content = await response.json()
         return TidalStream(**content)
 
-    def get_track_lyrics(self, track_id: int) -> str | None:
+    async def get_track_lyrics(self, track_id: int) -> str | None:
         lyrics = None
-        with suppress(HTTPError):
+        with suppress(ClientError):
             lyrics_url = f"{self._config.lyrics_v1_url}/tracks/{track_id}/lyrics"
             params = {"locale": "en_US", "deviceType": "BROWSER"}
-            lyrics = self._authenticated_request(lyrics_url, params).json()["lyrics"]
+            response = await self._request("GET", lyrics_url, params=params)
+            content = await response.json()
+            lyrics = content["lyrics"]
         return lyrics
 
-    def download_track(self, album: TidalAlbum, track: TidalTrack, track_stream: TidalStream) -> None:
+    async def download_track(self, album: TidalAlbum, track: TidalTrack, track_stream: TidalStream) -> None:
         """
         Download logic:
         - Prepare the path (noop if exists)
@@ -189,8 +174,9 @@ class TidalClient:
         file_path.relative_to(folder)
 
         logger.info(f"Now downloading: {track.name}")
-        track_bytes = self._request(track_stream.url).content
-        lyrics: str | None = self.get_track_lyrics(track.id)
+        resp = await self._request("GET", track_stream.url)
+        track_bytes = await resp.content.read()
+        lyrics: str | None = await self.get_track_lyrics(track.id)
 
         with tempfile.NamedTemporaryFile() as temp_file:
             temp_file.write(track_bytes)
@@ -202,4 +188,4 @@ class TidalClient:
         if self._config.sleep_between_downloads:
             random_time = randrange(1000, 5000) / 1000
             logger.info(f"Sleeping {random_time:.2f} seconds")
-        time.sleep(random_time)
+        await asyncio.sleep(random_time)

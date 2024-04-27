@@ -2,6 +2,10 @@ import pykakasi
 
 kks = pykakasi.kakasi()
 
+USER_AGENT = (
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+)
+
 
 def romanize(text: str) -> str:
     return "".join(p["hepburn"] for p in kks.convert(text))

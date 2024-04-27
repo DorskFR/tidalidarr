@@ -1,11 +1,11 @@
 import logging
-from collections.abc import Iterator
+from collections.abc import AsyncIterator
 from contextlib import suppress
 from pathlib import Path
 from typing import Any
 
+from aiohttp import ClientError, ClientResponse, ClientSession
 from pydantic import HttpUrl
-from requests import HTTPError, Response, Session
 from tenacity import (
     after_log,
     retry,
@@ -20,42 +20,34 @@ logger = logging.getLogger(__name__)
 
 
 class LidarrClient:
-    def __init__(self, config: LidarrConfig, session: Session | None = None) -> None:
+    def __init__(self, config: LidarrConfig, session: ClientSession) -> None:
         self._config = config
-        self._session = session or Session()
+        self._session = session
 
     @retry(
         wait=wait_fixed(30),
-        retry=retry_if_exception_type(HTTPError),
+        retry=retry_if_exception_type(ClientError),
         stop=stop_after_delay(300),
         after=after_log(logger, logging.WARNING),
         reraise=True,
     )
-    def _request(
+    async def _request(
         self,
         method: str,
         url: HttpUrl | str,
-        params: dict[str, Any] | None = None,
         payload: dict[str, Any] | None = None,
-    ) -> Response:
-        response = self._session.request(method, str(url), params=params, json=payload, timeout=10)
-        response.raise_for_status()
-        return response
-
-    def _get(self, url: HttpUrl | str, params: dict[str, Any] | None = None) -> Response:
-        return self._request("GET", url, params={"apikey": self._config.api_key} | (params or {}))
-
-    def _post(
-        self, url: HttpUrl | str, params: dict[str, Any] | None = None, payload: dict[str, Any] | None = None
-    ) -> Response:
-        return self._request(
-            "POST",
-            url,
-            params={"apikey": self._config.api_key} | (params or {}),
-            payload=payload,
+        params: dict[str, Any] | None = None,
+        headers: dict[str, Any] | None = None,
+    ) -> ClientResponse:
+        return await self._session.request(
+            method,
+            str(url),
+            json=payload,
+            params=(params or {}) | {"apikey": self._config.api_key},
+            headers=headers,
         )
 
-    def get_missing_albums(self) -> Iterator[str]:
+    async def get_missing_albums(self) -> AsyncIterator[str]:
         """
         Call Lidarr API to obtain all the missing releases.
         While paginating, we yield one string at a time to query Tidal.
@@ -70,7 +62,8 @@ class LidarrClient:
             "sortDirection": "descending",
         }
         while True:
-            content = self._get(url, params=params).json()
+            response = await self._request("GET", url, params=params)
+            content = await response.json()
             records = content["records"]
             for record in records:
                 if record["albumType"] != "Album":
@@ -82,7 +75,7 @@ class LidarrClient:
                 break
             params["page"] += 1
 
-    def trigger_import(self, folder: Path) -> None:
+    async def trigger_import(self, folder: Path) -> None:
         """
         This is the automatic scanning feature of Lidarr.
         However it does not seem to trigger imports most of the time...
@@ -90,9 +83,9 @@ class LidarrClient:
         url = f"{self._config.api_url}/command"
         path = self._config.download_path / folder
         payload = {"name": "DownloadedAlbumsScan", "path": path.as_posix()}
-        self._post(url, payload=payload)
+        await self._request("POST", url, payload=payload)
 
-    def manual_import(self, folder: Path) -> None:
+    async def manual_import(self, folder: Path) -> None:
         """
         The first call is the same as clicking "manual import" in Lidarr's web UI
         We use it by passing a specific release path so that we only scan the tracks of a single release at at time.
@@ -107,7 +100,8 @@ class LidarrClient:
             "filterExistingFiles": True,
             "replaceExistingFiles": False,
         }
-        content = self._get(url, params=params).json()
+        response = await self._request("GET", url, params=params)
+        content = await response.json()
 
         missing_tracks: list[LidarrMissingTrack] = []
         for track in content:
@@ -119,9 +113,9 @@ class LidarrClient:
             except ValueError:
                 logger.warn(f"Not importing {path}, tracks have missing fields")
                 return
-        self._manual_import(missing_tracks)
+        await self._manual_import(missing_tracks)
 
-    def _manual_import(self, missing_tracks: list[LidarrMissingTrack]) -> None:
+    async def _manual_import(self, missing_tracks: list[LidarrMissingTrack]) -> None:
         """
         This triggers the actual import of tracks by Lidarr.
         We use the output of the previous command and return to Lidarr the list of tracks validated for import.
@@ -133,7 +127,7 @@ class LidarrClient:
             "importMode": "move",
             "replaceExistingFiles": False,
         }
-        self._post(url, payload=payload)
+        await self._request("POST", url, payload=payload)
 
     def cleanup_download_folder(self) -> None:
         """
