@@ -1,10 +1,12 @@
 import logging
 import os
 import time
+from threading import Thread
 
 import requests
 import sentry_sdk
 
+from tidalidarr.api.server import run_server
 from tidalidarr.lidarr.client import LidarrClient, LidarrConfig
 from tidalidarr.tidal.client import TidalClient
 from tidalidarr.tidal.models import TidalConfig
@@ -41,4 +43,6 @@ if __name__ == "__main__":
         enable_tracing=True,
         traces_sample_rate=1.0,
     )
-    main()
+    server_thread = Thread(target=run_server)
+    server_thread.start()
+    # main()
