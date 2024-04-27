@@ -120,13 +120,18 @@ class TidalClient:
         - Download each track
         """
         logger.info(f"Downloading album: {album.title}")
+        yield f"Downloading album: {album.title}\n\n"
+
         album.cover_bytes = self.get_album_cover(album)
         track_list = self.get_track_list(album)
+
         for track in track_list:
             track_stream = self.get_track_stream(track.id)
             self.download_track(album, track, track_stream)
-            yield f"{track.track_number}/{album.number_of_tracks} {track.name}"
+            yield f"{track.track_number}/{album.number_of_tracks} {track.name}\n"
+
         logger.info(f"Finished downloading album: {album.title}")
+        yield f"\nFinished downloading album: {album.title}\n"
 
     def get_track_list(self, album: TidalAlbum) -> list[TidalTrack]:
         url = f"{self._config.api_hifi_url}/albums/{album.id}/items"

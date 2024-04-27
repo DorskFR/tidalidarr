@@ -6,4 +6,6 @@ pydantic~=2.7.0
 pykakasi~=2.2.0
 requests~=2.31.0
 sentry-sdk~=2.0.0
+starlette~=0.37.0
 tenacity~=8.2.0
+uvicorn~=0.29.0
