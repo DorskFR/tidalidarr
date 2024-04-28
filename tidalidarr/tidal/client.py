@@ -35,9 +35,12 @@ class TidalClient(TidalBaseClient):
 
     async def process_queue(self) -> None:
         while True:
-            album = await self._download_queue.get()
-            await self._download_album(album)
-            await self._ready_queue.put(album.folder)
+            try:
+                album = self._download_queue.get_nowait()
+                await self._download_album(album)
+                await self._ready_queue.put(album.folder)
+            except asyncio.QueueEmpty:
+                await asyncio.sleep(1)
 
     async def get_ready_paths(self) -> AsyncIterator[Path]:
         while True:
