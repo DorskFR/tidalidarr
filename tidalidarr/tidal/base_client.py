@@ -1,3 +1,4 @@
+import asyncio
 import json
 import logging
 from contextlib import suppress
@@ -43,11 +44,12 @@ class TidalBaseClient:
     ) -> ClientResponse:
         if not self._token:
             self._token = await self.login()
-        url = url if isinstance(url, HttpUrl) else HttpUrl(url)
-        if url.path != "/v1/sessions" and not (await self.verify_access_token()):
+        if HttpUrl(str(url)).path != "/v1/sessions" and not (await self.verify_access_token()):
             self._token = await self.login()
         if is_authenticated:
+            params = (params or {}) | {"countryCode": self._config.country_code}
             headers = (headers or {}) | {"Authorization": f"Bearer {self._token.access_token}"}
+        await asyncio.sleep(1)  # TODO: cheap rate limit to avoid 429, to improve
         return await self._session.request(
             method,
             str(url),

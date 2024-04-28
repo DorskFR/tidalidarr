@@ -12,7 +12,7 @@ from starlette.applications import Starlette
 from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
-from starlette.responses import JSONResponse, PlainTextResponse, StreamingResponse
+from starlette.responses import JSONResponse, PlainTextResponse
 from starlette.routing import Route
 
 from tidalidarr.lidarr.client import LidarrClient, LidarrConfig
@@ -37,7 +37,7 @@ class State(TypedDict):
     session: ClientSession
     tidal_client: TidalClient
     lidarr_client: LidarrClient
-    background_task: asyncio.Task
+    background_tasks: set[asyncio.Task]
 
 
 @contextlib.asynccontextmanager
@@ -47,32 +47,36 @@ async def lifespan(_app: Starlette) -> AsyncIterator[State]:
     ) as session:
         tidal_client = TidalClient(TidalConfig(), session)
         lidarr_client = LidarrClient(LidarrConfig(), session)
-        task_handle = asyncio.create_task(periodic_check(tidal_client, lidarr_client))
+        task_handles = {
+            asyncio.create_task(periodic_check(tidal_client, lidarr_client)),
+            asyncio.create_task(tidal_client.process_queue()),
+        }
         try:
             yield {
                 "session": session,
                 "tidal_client": tidal_client,
                 "lidarr_client": lidarr_client,
-                "background_task": task_handle,
+                "background_tasks": task_handles,
             }
         finally:
-            task_handle.cancel()
+            for handle in task_handles:
+                with contextlib.suppress(asyncio.CancelledError):
+                    handle.cancel()
 
 
 async def periodic_check(tidal_client: TidalClient, lidarr_client: LidarrClient) -> None:
-    await asyncio.sleep(5)  # letting the webserver start
     while True:
-        logger.info("Starting periodic check")
+        logger.info("Checking all missing albums")
         async for query in lidarr_client.get_missing_albums():
             lidarr_client.cleanup_download_folder()
-            path = await tidal_client.search(query)
-            if not path and contains_japanese(query):
-                path = await tidal_client.search(romanize(query))
-            if path:
-                await lidarr_client.manual_import(path)
-                await lidarr_client.trigger_import(path)
+            if not (await tidal_client.search(query)) and contains_japanese(query):
+                await tidal_client.search(romanize(query))
             await asyncio.sleep(0)
-        logger.info("Finished checking all missing albums, waiting 60 seconds before next iteration")
+        logger.info("Importing ready paths")
+        async for path in tidal_client.get_ready_paths():
+            await lidarr_client.trigger_import(path)
+            await lidarr_client.manual_import(path)
+        logger.info("Finished periodic check, sleeping 60 seconds")
         await asyncio.sleep(60)
 
 
@@ -92,13 +96,13 @@ async def slow_numbers(minimum, maximum):
     yield "</ul></body></html>"
 
 
-async def get_album(request: Request) -> StreamingResponse | JSONResponse:
+async def get_album(request: Request) -> JSONResponse:
     tidal_client: TidalClient = request.state.tidal_client
     try:
         album_id = int(request.path_params["album_id"])
         album = await tidal_client.find_album(album_id)
-        progress = await tidal_client.download_album(album)
-        return StreamingResponse(progress, media_type="text/event-stream")
+        result = await tidal_client.enqueue_album(album)
+        return JSONResponse({"result": result}, status_code=200)
     except ValueError:
         return JSONResponse({"error": "Invalid album id"}, status_code=400)
 

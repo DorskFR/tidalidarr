@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from collections.abc import AsyncIterator
 from contextlib import suppress
@@ -74,6 +75,7 @@ class LidarrClient:
             if len(records) < page_size:
                 break
             params["page"] += 1
+            await asyncio.sleep(0)
 
     async def trigger_import(self, folder: Path) -> None:
         """
