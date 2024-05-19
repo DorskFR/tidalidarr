@@ -127,4 +127,4 @@ app = Starlette(
 
 if __name__ == "__main__":
     with contextlib.suppress(asyncio.CancelledError, KeyboardInterrupt):
-        uvicorn.run(app, host="0.0.0.0", port=8000)
+        uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("TIDALIDARR_UVICORN_PORT", "8000")))

@@ -16,13 +16,14 @@ In its first version this program is opinionated:
 The full settings are in the `BaseSettings` models.
 The main variables that might require changes are:
 
-| Variable              | Required | Default                      | Description                                         |
-| --------------------- | -------- | ---------------------------- | --------------------------------------------------- |
-| `TIDAL_DOWNLOAD_PATH` | `No`     | /downloads                   | Persistent storage to save music files              |
-| `TIDAL_TOKEN_PATH`    | `No`     | token.json                   | Persistent storage to save the authentication token |
-| `LIDARR_API_URL`      | `Yes`    | http://127.0.0.1:8686/api/v1 | Lidarr API endpoint                                 |
-| `LIDARR_API_KEY`      | `Yes`    |                              | Lidarr API key                                      |
-| `LOG_LEVEL`           | `No`     |                              | Python log levels: DEBUG, INFO, WARNING, ERROR      |
+| Variable                  | Required | Default                      | Description                                         |
+| ------------------------- | -------- | ---------------------------- | --------------------------------------------------- |
+| `LIDARR_API_KEY`          | `Yes`    |                              | Lidarr API key                                      |
+| `LIDARR_API_URL`          | `Yes`    | http://127.0.0.1:8686/api/v1 | Lidarr API endpoint                                 |
+| `TIDAL_DOWNLOAD_PATH`     | `No`     | /downloads                   | Persistent storage to save music files              |
+| `TIDAL_TOKEN_PATH`        | `No`     | token.json                   | Persistent storage to save the authentication token |
+| `TIDALIDARR_UVICORN_PORT` | `No`     | 8000                         | Port on which uvicorn should bind                   |
+| `LOG_LEVEL`               | `No`     |                              | Python log levels: DEBUG, INFO, WARNING, ERROR      |
 
 ### Docker (pull)
 
