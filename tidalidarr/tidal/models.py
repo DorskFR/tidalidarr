@@ -1,7 +1,7 @@
 import base64
 import json
 from datetime import date
-from enum import StrEnum
+from enum import Enum, StrEnum, auto
 from functools import cached_property
 from pathlib import Path
 from typing import Any, Literal
@@ -14,17 +14,38 @@ from pydantic import BaseModel, ConfigDict, EmailStr, HttpUrl, model_validator
 from pydantic.alias_generators import to_camel
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-
 #
 # Errors
 #
-class TidalLoginFailedError(Exception):
+
+
+class TidalAuthenticationError(Exception):
+    """Raised when an authentication method has failed"""
+
+
+class TidalLoginWithDeviceFailedError(TidalAuthenticationError):
     """Raised when logging in failed"""
+
+
+class TidalAllAuthenticationFailedError(TidalAuthenticationError):
+    """Raised when all authentication methods have failed"""
 
 
 #
 # Enums
 #
+
+
+class AuthState(Enum):
+    ACCESS_TOKEN_EXPIRED = auto()
+    ACCESS_TOKEN_REFRESHED = auto()
+    LOGGED_IN = auto()
+    REFRESH_TOKEN_EXPIRED = auto()
+    SUBSCRIPTION_EXPIRED = auto()
+    TOKEN_PRESENT = auto()
+    UNAUTHENTICATED = auto()
+
+
 class AudioQuality(StrEnum):
     HI_RES = "HI_RES"
     HIGH = "HIGH"

@@ -75,7 +75,7 @@ class TidalClient(TidalBaseClient):
     async def find_album(self, album_id: int) -> TidalAlbum:
         params = {"countryCode": self._config.country_code}
         url = f"{self._config.api_hifi_url}/albums/{album_id}"
-        response = await self._request("GET", url, params=params, is_authenticated=True)
+        response = await self._request("GET", url, params=params, with_auth_headers=True)
         content = await response.json()
         return TidalAlbum(**content)
 
@@ -97,7 +97,7 @@ class TidalClient(TidalBaseClient):
         logger.info(f"Searching for: {query}")
         params = {"query": query, "countryCode": self._config.country_code}
         url = f"{self._config.api_hifi_url}/search"
-        resp = await self._request("GET", url, params=params, is_authenticated=True)
+        resp = await self._request("GET", url, params=params, with_auth_headers=True)
         content = await resp.json()
         result = TidalSearchResult(**content)
         self._log_search_result(result)
@@ -138,7 +138,7 @@ class TidalClient(TidalBaseClient):
 
     async def _get_track_list(self, album: TidalAlbum) -> list[TidalTrack]:
         url = f"{self._config.api_hifi_url}/albums/{album.id}/items"
-        response = await self._request("GET", url, params={"limit": 100}, is_authenticated=True)
+        response = await self._request("GET", url, params={"limit": 100}, with_auth_headers=True)
         content = await response.json()
         track_list = [TidalTrack(**item["item"]) for item in content["items"]]
         logger.info(f"Album {album.title} ({album.id}) has {len(track_list)} tracks")
@@ -163,7 +163,7 @@ class TidalClient(TidalBaseClient):
             "assetpresentation": AssetPresentation.FULL,
         }
         url = f"{self._config.api_hifi_url}/tracks/{track_id}/playbackinfopostpaywall"
-        response = await self._request("GET", url, params=params, is_authenticated=True)
+        response = await self._request("GET", url, params=params, with_auth_headers=True)
         content = await response.json()
         return TidalStream(**content)
 
@@ -172,7 +172,7 @@ class TidalClient(TidalBaseClient):
         with suppress(ClientError):
             lyrics_url = f"{self._config.lyrics_v1_url}/tracks/{track_id}/lyrics"
             params = {"locale": "en_US", "deviceType": "BROWSER"}
-            response = await self._request("GET", lyrics_url, params=params, is_authenticated=True)
+            response = await self._request("GET", lyrics_url, params=params, with_auth_headers=True)
             content = await response.json()
             lyrics = content["lyrics"]
         return lyrics
