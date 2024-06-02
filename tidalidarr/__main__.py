@@ -70,11 +70,11 @@ async def periodic_check(tidal_client: TidalClient, lidarr_client: LidarrClient)
         async for query in lidarr_client.get_missing_albums():
             if not (await tidal_client.search(query)) and contains_japanese(query):
                 await tidal_client.search(romanize(query))
+            # Let's nest this so that we try to import often instead of waiting for all downloads to be processed
+            async for path in tidal_client.get_ready_paths():
+                await lidarr_client.trigger_import(path)
+                await lidarr_client.manual_import(path)
             await asyncio.sleep(0)
-        logger.info("Importing ready paths")
-        async for path in tidal_client.get_ready_paths():
-            await lidarr_client.trigger_import(path)
-            await lidarr_client.manual_import(path)
         logger.info("Finished periodic check, sleeping 60 seconds")
         lidarr_client.cleanup_download_folder()  # only cleanup after imports are done
         await asyncio.sleep(60)
