@@ -72,7 +72,7 @@ class TidalBaseClient:
                 params=params,
             )
         except ClientResponseError as error:
-            logger.exception(f"❌ There was an issue: {error.status} - {error.message}")
+            logger.debug(f"❌ There was an issue: {error}")
             raise
         return response
 
