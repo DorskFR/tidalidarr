@@ -68,7 +68,6 @@ async def periodic_check(tidal_client: TidalClient, lidarr_client: LidarrClient)
     while True:
         logger.info("Checking all missing albums")
         async for query in lidarr_client.get_missing_albums():
-            lidarr_client.cleanup_download_folder()
             if not (await tidal_client.search(query)) and contains_japanese(query):
                 await tidal_client.search(romanize(query))
             await asyncio.sleep(0)
@@ -77,6 +76,7 @@ async def periodic_check(tidal_client: TidalClient, lidarr_client: LidarrClient)
             await lidarr_client.trigger_import(path)
             await lidarr_client.manual_import(path)
         logger.info("Finished periodic check, sleeping 60 seconds")
+        lidarr_client.cleanup_download_folder()  # only cleanup after imports are done
         await asyncio.sleep(60)
 
 

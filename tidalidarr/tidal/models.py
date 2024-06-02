@@ -14,6 +14,8 @@ from pydantic import BaseModel, ConfigDict, EmailStr, HttpUrl, model_validator
 from pydantic.alias_generators import to_camel
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from tidalidarr.utils import sanitize
+
 #
 # Errors
 #
@@ -151,7 +153,7 @@ class TidalAlbum(TidalAlbumStub):
 
     @cached_property
     def folder(self) -> Path:
-        return Path(next(iter(self.artists)).name) / self.title
+        return Path(sanitize(next(iter(self.artists)).name)) / sanitize(self.title)
 
     @cached_property
     def cover_urls(self) -> list[HttpUrl]:

@@ -1,3 +1,5 @@
+import re
+
 import pykakasi
 
 kks = pykakasi.kakasi()
@@ -5,6 +7,12 @@ kks = pykakasi.kakasi()
 USER_AGENT = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
 )
+
+PATTERN = re.compile(r'[\/\\:\*\?"<>\|]')
+
+
+def sanitize(text: str) -> str:
+    return PATTERN.sub("", text)
 
 
 def romanize(text: str) -> str:

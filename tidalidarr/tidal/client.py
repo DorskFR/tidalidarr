@@ -41,6 +41,8 @@ class TidalClient(TidalBaseClient):
                 await self._ready_queue.put(album.folder)
             except asyncio.QueueEmpty:
                 await asyncio.sleep(1)
+            except Exception:
+                logger.exception("Unexpected error while processing queue")
 
     async def get_ready_paths(self) -> AsyncIterator[Path]:
         while True:
