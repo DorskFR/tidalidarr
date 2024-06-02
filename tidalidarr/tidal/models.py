@@ -123,7 +123,7 @@ class TidalToken(TidalModel):
 class TidalArtistStub(TidalModel):
     id: int
     name: str
-    picture: UUID | None
+    picture: UUID | None = None
 
 
 class TidalArtist(TidalArtistStub):
@@ -144,7 +144,7 @@ class TidalAlbum(TidalAlbumStub):
     audio_quality: AudioQuality
     audio_modes: list[AudioMode]
     artists: list[TidalArtistStub]
-    release_date: date | None
+    release_date: date | None = None
     cover_bytes: bytes | None = None
 
     @cached_property
@@ -178,12 +178,12 @@ class TidalStream(TidalModel):
     manifest_mime_type: str
     manifest_hash: str
     manifest: str
-    album_replay_gain: float | None
-    album_peak_amplitude: float | None
-    track_replay_gain: float | None
-    track_peak_amplitude: float | None
-    bit_depth: int | None
-    sample_rate: int | None
+    album_replay_gain: float | None = None
+    album_peak_amplitude: float | None = None
+    track_replay_gain: float | None = None
+    track_peak_amplitude: float | None = None
+    bit_depth: int | None = None
+    sample_rate: int | None = None
 
     @cached_property
     def decoded_manifest(self) -> TidalStreamManifest:
@@ -203,7 +203,7 @@ class TidalTrack(TidalModel):
     allow_streaming: bool
     track_number: int
     volume_number: int
-    bpm: int | None
+    bpm: int | None = None
     url: str
     isrc: str
     audio_quality: AudioQuality
@@ -268,7 +268,7 @@ class TidalSearchResult(TidalModel):
     artists: list[TidalArtist]
     albums: list[TidalAlbum]
     tracks: list[TidalTrack]
-    top_hit: dict[str, Any] | None
+    top_hit: dict[str, Any] | None = None
 
     @model_validator(mode="before")
     @staticmethod
