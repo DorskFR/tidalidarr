@@ -9,7 +9,40 @@ In its first version this program is opinionated:
 - Only top hits
 - Only FLAC
 
-## Installation
+## Why use this
+
+- Simple, straightforward
+- Does only one "thing": download your lidarr missing albums from tidal
+- Made to run along side Lidarr
+
+## How to use
+
+### Authenticating
+
+On first run you need to authorize your device.
+Credentials are then saved to `token.json` and refresh is automatic afterwards.
+
+- On first run authentication with device will be attempted for 5 minutes
+- In the logs you will see a link pointing to tidal and requiring authentication
+- After the device is authorized, there is a ~30sc delay before authentication succeeds and the token is written to `token.json`
+
+### Automatic download
+
+Tidalidarr queries your lidarr instance for missing albums and starts searching / downloading
+
+### Manually adding albums
+
+Since the search functionality is so basic, I added an API endpoint to add albums manually at `/album/{album_id}`.
+
+When browsing Tidal, replace the beginning of the URL `https://listen.tidal.com/album/1234` with your Tidalidarr URL and it should add the album to the download queue.
+
+You can also use curl with a simple GET to add multiple albums. ex:
+
+```bash
+curl http://localhost:8000/album/1234
+```
+
+## Deployment
 
 ### Environment variables
 
@@ -25,7 +58,7 @@ The main variables that might require changes are:
 | `TIDALIDARR_UVICORN_PORT` | `No`     | 8000                         | Port on which uvicorn should bind                   |
 | `LOG_LEVEL`               | `No`     |                              | Python log levels: DEBUG, INFO, WARNING, ERROR      |
 
-### Docker (pull)
+### Docker
 
 ```bash
 docker run --rm --name tidalidarr \
@@ -38,7 +71,7 @@ docker run --rm --name tidalidarr \
   ghcr.io/dorskfr/tidalidarr:latest
 ```
 
-### Docker compose (pull)
+### Docker compose
 
 Setup environment variables via `.env` or else and:
 
@@ -56,7 +89,7 @@ services:
       - LIDARR_API_KEY=${LIDARR_API_KEY}
     volumes:
       - ./downloads:/downloads
-      - ./token.json:/token.json
+      - ./token.json:/token.json # needs write permission
 ```
 
 ```bash
@@ -102,7 +135,7 @@ spec:
             - configMapRef:
                 name: tidalidarr
           volumeMounts:
-            - mountPath: /config
+            - mountPath: /config # needs write permission
                 name: tidalidarr-config-volume
             - mountPath: /downloads
               name: shared-download-volume
@@ -147,12 +180,6 @@ spec:
 - https://github.com/exislow/tidal-dl-ng a cleaner and more modern approach to the above, still uses the same tidal api package.
 - https://github.com/tamland/python-tidal the tidal api package internally used by the projects above, has [non straightforward code](https://github.com/tamland/python-tidal/blob/288fc1ea53d6ca0a23424795ecae3a09b0ec43a3/tidalapi/session.py#L141).
 - https://github.com/ramok0/tidal-rs a clean library to interact with the tidal API, used as a reference in this project
-
-## Why use this
-
-- Simple, straightforward
-- Does only one "thing": download your lidarr missing albums from tidal
-- Made to run along side Lidarr
 
 ## Development
 
