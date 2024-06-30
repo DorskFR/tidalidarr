@@ -42,6 +42,14 @@ You can also use curl with a simple GET to add multiple albums. ex:
 curl http://localhost:8000/album/1234
 ```
 
+## Checking the queue
+
+You can check the current state (queued, ready, not found) by calling your instance at `/queue` endpoint.
+
+```bash
+curl http://localhost:8000/queue
+```
+
 ## Deployment
 
 ### Environment variables
