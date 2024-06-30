@@ -15,7 +15,10 @@ from tenacity import (
 )
 
 from tidalidarr.tidal.models import (
+    AssetPresentation,
+    AudioQuality,
     AuthState,
+    PlaybackMode,
     TidalAllAuthenticationFailedError,
     TidalAuthenticationError,
     TidalConfig,
@@ -72,7 +75,10 @@ class TidalBaseClient:
                 params=params,
             )
         except ClientResponseError as error:
-            logger.debug(f"❌ There was an issue: {error}")
+            if error.status == 401:
+                async with self._auth_lock:
+                    await self._verify_access_token()
+                    await self._test_download()
             raise
         return response
 
@@ -81,11 +87,12 @@ class TidalBaseClient:
             if not self._token:
                 self._load_token()
 
-            if self._auth_state is AuthState.UNAUTHENTICATED:
-                await self._login()
-
             if self._auth_state is AuthState.TOKEN_PRESENT:
                 await self._verify_access_token()
+                await self._test_download()
+
+            if self._auth_state is AuthState.UNAUTHENTICATED:
+                await self._login()
 
             if self._auth_state is AuthState.ACCESS_TOKEN_EXPIRED:
                 await self._login_with_refresh_token()
@@ -101,6 +108,8 @@ class TidalBaseClient:
             raise
 
     def _change_state(self, new_state: AuthState) -> None:
+        if self._auth_state == new_state:
+            return
         match (self._auth_state, new_state):
             case (AuthState.UNAUTHENTICATED, AuthState.TOKEN_PRESENT):
                 self._auth_state = new_state
@@ -109,6 +118,8 @@ class TidalBaseClient:
             case (AuthState.TOKEN_PRESENT, AuthState.ACCESS_TOKEN_EXPIRED):
                 self._auth_state = new_state
             case (AuthState.TOKEN_PRESENT, AuthState.LOGGED_IN):
+                self._auth_state = new_state
+            case (AuthState.LOGGED_IN, AuthState.UNAUTHENTICATED):
                 self._auth_state = new_state
             case (AuthState.LOGGED_IN, AuthState.ACCESS_TOKEN_EXPIRED):
                 self._auth_state = new_state
@@ -121,7 +132,7 @@ class TidalBaseClient:
             case (AuthState.REFRESH_TOKEN_EXPIRED, AuthState.LOGGED_IN):
                 self._auth_state = new_state
             case _:
-                raise ValueError("This state transition is not allowed")
+                raise ValueError(f"This state transition is not allowed: {self._auth_state} -> {new_state}")
         logger.info(f"🔏 New auth state: {self._auth_state}")
 
     def _load_token(self) -> None:
@@ -159,7 +170,7 @@ class TidalBaseClient:
         try:
             logger.info("Logging in with device authorization")
             device_authorization = await self._get_device_authorization()
-            logger.info(f"Please login at this URL: https://{device_authorization.verification_uri_complete}")
+            logger.info(f"🌐 Please login at this URL: https://{device_authorization.verification_uri_complete}")
             self._token = await self._login_with_device_code(device_authorization)
             self._save_token(self._token)
             self._config.country_code = self._token.user.country_code
@@ -183,7 +194,7 @@ class TidalBaseClient:
         return TidalDeviceAuth(**content)
 
     @retry(
-        wait=wait_fixed(60),
+        wait=wait_fixed(10),
         retry=retry_if_exception_type(ClientError),
         stop=stop_after_delay(300),
         after=after_log(logger, logging.WARNING),
@@ -230,3 +241,20 @@ class TidalBaseClient:
         except ClientError:
             logger.warning("❌ Refresh token is not valid")
             self._change_state(AuthState.REFRESH_TOKEN_EXPIRED)
+
+    async def _test_download(self) -> None:
+        try:
+            url = f"{self._config.api_hifi_url}/tracks/{self._config.test_track_id}/playbackinfopostpaywall"
+            await self._session.get(
+                str(url),
+                headers={"Authorization": f"Bearer {self._token and self._token.access_token}"},
+                params={
+                    "audioquality": AudioQuality.LOW,
+                    "playbackmode": PlaybackMode.STREAM,
+                    "assetpresentation": AssetPresentation.FULL,
+                    "countryCode": self._config.country_code,
+                },
+            )
+        except ClientError:
+            logger.warning("❌ Could not complete the test download, is the account subscribed?")
+            self._change_state(AuthState.UNAUTHENTICATED)
