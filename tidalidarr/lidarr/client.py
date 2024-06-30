@@ -98,9 +98,11 @@ class LidarrClient:
         path = self._config.download_path / folder
         params = {
             "artistId": 0,
-            "folder": path.as_posix(),
-            "filterExistingFiles": True,
-            "replaceExistingFiles": False,
+            "folder": "/" + path.as_posix().removeprefix("/"),
+            # If using directly a bool yarl will complain that boolean cannot be url encoded
+            # If using "true" or "false" lidarr will complain as C# cannot parse as Boolean
+            "filterExistingFiles": "True",
+            "replaceExistingFiles": "False",
         }
         response = await self._request("GET", url, params=params)
         content = await response.json()
