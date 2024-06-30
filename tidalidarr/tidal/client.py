@@ -112,7 +112,7 @@ class TidalClient(TidalBaseClient):
         Trigger a search to Tidal's API using a query string built with Artist + release name
         If found, we return the search model with all the parsed fields.
         """
-        logger.info(f"Searching for: {query}")
+        logger.info(f"🔍 Searching for: {query}")
         params = {"query": query, "countryCode": self._config.country_code}
         url = f"{self._config.api_hifi_url}/search"
         resp = await self._request("GET", url, params=params, with_auth_headers=True)
@@ -146,7 +146,7 @@ class TidalClient(TidalBaseClient):
         - Get the list of tracks and their stream URL
         - Download each track
         """
-        logger.info(f"Downloading album: {album.title}")
+        logger.info(f"💿 Downloading album: {album.title}")
         album.cover_bytes = await self._get_album_cover(album)
         track_list = await self._get_track_list(album)
         for track in track_list:
@@ -164,7 +164,7 @@ class TidalClient(TidalBaseClient):
 
     async def _get_album_cover(self, album: TidalAlbum) -> bytes | None:
         cover_bytes = None
-        logger.info(f"Downloading a cover for: {album.title}")
+        logger.info(f"🌆 Downloading a cover for: {album.title}")
         for cover_url in album.cover_urls:
             with suppress(ClientError):
                 response = await self._request("GET", cover_url)
@@ -210,11 +210,11 @@ class TidalClient(TidalBaseClient):
 
         file_path = folder / track.name
         if file_path.exists():
-            logger.info(f"File exists: {file_path}")
+            logger.info(f"👯‍♀️ File exists: {file_path}")
             return
         file_path.relative_to(folder)
 
-        logger.info(f"Now downloading: {track.name}")
+        logger.info(f"⚡️ Now downloading: {track.name}")
         resp = await self._request("GET", track_stream.url)
         track_bytes = await resp.content.read()
         lyrics: str | None = await self._get_track_lyrics(track.id)
@@ -224,9 +224,9 @@ class TidalClient(TidalBaseClient):
             temp_file.flush()
             track.save_metadata(album, track_stream, temp_file.name, album.cover_bytes, lyrics)
             shutil.move(temp_file.name, file_path)
-            logger.info(f"Saved {file_path}")
+            logger.info(f"📥 Saved {file_path}")
 
         if self._config.sleep_between_downloads:
             random_time = randrange(1000, 5000) / 1000
-            logger.info(f"Sleeping {random_time:.2f} seconds")
+            logger.info(f"😴 Sleeping {random_time:.2f} seconds")
         await asyncio.sleep(random_time)
