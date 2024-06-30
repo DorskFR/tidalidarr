@@ -22,3 +22,4 @@ jobs:
       - run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
       - run: IMAGE_TAG=${{ env.VERSION }} make docker/build
       - run: IMAGE_TAG=${{ env.VERSION }} make docker/push
+      - run: IMAGE_TAG=latest make docker/push

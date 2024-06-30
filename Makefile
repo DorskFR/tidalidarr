@@ -46,7 +46,6 @@ docker/build:
 
 docker/push:
 	docker push  $(REPOSITORY_URL):$(IMAGE_TAG)
-	docker push  $(REPOSITORY_URL):latest
 
 docker/run:
 	docker run --rm -it --name $(APP) $(REPOSITORY_URL):$(IMAGE_TAG)

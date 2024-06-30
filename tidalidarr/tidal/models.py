@@ -251,7 +251,7 @@ class TidalTrack(TidalModel):
         if stream.album_peak_amplitude:
             metadata.tags["replaygain_album_peak"] = f"{stream.album_peak_amplitude:.8f}"
 
-        if cover_bytes:
+        if cover_bytes and isinstance(metadata, mutagen.flac.FLAC):
             flac_cover = mutagen.flac.Picture()
             flac_cover.type = mutagen.id3.PictureType.COVER_FRONT
             flac_cover.data = cover_bytes
