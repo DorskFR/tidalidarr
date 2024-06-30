@@ -1,5 +1,6 @@
 import asyncio
 import contextlib
+import json
 import logging
 import os
 from collections.abc import AsyncIterator
@@ -88,12 +89,9 @@ async def index(_request: Request) -> PlainTextResponse:
     return PlainTextResponse(content="Hello!")
 
 
-async def slow_numbers(minimum, maximum):
-    yield "<html><body><ul>"
-    for number in range(minimum, maximum + 1):
-        yield "<li>%d</li>" % number
-        await asyncio.sleep(0.5)
-    yield "</ul></body></html>"
+async def queue_info(request: Request) -> JSONResponse:
+    queue_information = request.state.tidal_client.get_queue_information()
+    return JSONResponse(content=json.loads(queue_information.json()))
 
 
 async def get_album(request: Request) -> JSONResponse:
@@ -111,6 +109,7 @@ app = Starlette(
     routes=[
         Route("/healthz", endpoint=healthz, methods=["GET"]),
         Route("/album/{album_id}", endpoint=get_album, methods=["GET"]),
+        Route("/queue", endpoint=queue_info, methods=["GET"]),
         Route("/", endpoint=index, methods=["GET"]),
     ],
     lifespan=lifespan,

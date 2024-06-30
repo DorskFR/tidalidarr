@@ -17,6 +17,7 @@ from tidalidarr.tidal.models import (
     PlaybackMode,
     TidalAlbum,
     TidalConfig,
+    TidalQueueInformation,
     TidalSearchResult,
     TidalStream,
     TidalTrack,
@@ -33,6 +34,20 @@ class TidalClient(TidalBaseClient):
         self._ready_queue: asyncio.Queue[Path] = asyncio.Queue()
         self._enqueued: set[int] = set()
 
+    def get_queue_information(self) -> TidalQueueInformation:
+        albums = list(self._download_queue._queue)  # type: ignore[attr-defined] # noqa: SLF001
+        ready = list(self._ready_queue._queue)  # type: ignore[attr-defined] # noqa: SLF001
+        not_found = sorted(self._not_found.keys())
+
+        return TidalQueueInformation(
+            albums=albums,
+            albums_count=len(albums),
+            ready=ready,
+            ready_count=len(ready),
+            not_found=not_found,
+            not_found_count=len(not_found),
+        )
+
     async def process_queue(self) -> None:
         while True:
             try:
@@ -42,6 +57,7 @@ class TidalClient(TidalBaseClient):
             except asyncio.QueueEmpty:
                 await asyncio.sleep(1)
             except Exception:
+                self._download_queue.put_nowait(album)
                 logger.exception("Unexpected error while processing queue")
 
     async def get_ready_paths(self) -> AsyncIterator[Path]:

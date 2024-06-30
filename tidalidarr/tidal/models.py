@@ -286,3 +286,12 @@ class TidalSearchResult(TidalModel):
         if self.top_hit.get("type") != "ALBUMS":
             return None
         return self.top_hit.get("value", {}).get("id", None)
+
+
+class TidalQueueInformation(BaseModel):
+    albums: list[TidalAlbum]
+    albums_count: int
+    ready: list[Path]
+    ready_count: int
+    not_found: list[str]
+    not_found_count: int
