@@ -1,11 +1,11 @@
 aiohttp~=3.9.0
-email-validator~=2.1.0
+email-validator~=2.2.0
 mutagen~=1.47.0
 overrides~=7.7.0
-pydantic-settings~=2.2.0
+pydantic-settings~=2.3.4
 pydantic~=2.8.2
-pykakasi~=2.2.0
-sentry-sdk~=2.0.0
-starlette~=0.37.0
-tenacity~=8.2.0
+pykakasi~=2.3.0
+sentry-sdk~=2.10.0
+starlette~=0.38.0
+tenacity~=8.5.0
 uvicorn~=0.29.0
