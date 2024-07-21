@@ -1,5 +1,5 @@
 -r requirements.txt
 mypy~=1.11.0
 pytest~=8.1.0
-ruff~=0.3.0
+ruff~=0.5.4
 vulture~=2.11.0
