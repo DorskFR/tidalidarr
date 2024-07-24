@@ -50,4 +50,4 @@ docker/push:
 docker/run:
 	docker run --rm -it --name $(APP) $(REPOSITORY_URL):$(IMAGE_TAG)
 
-.PHONY: $(shell grep -E '^([a-zA-Z_-]|\/)+:' $(MAKEFILE_LIST) | awk -F':' '{print $2}' | sed 's/:.*//')
+.PHONY: $(shell grep -E '^([a-zA-Z_-]|\/)+:' $(MAKEFILE_LIST) | awk -F':' '{print $$2}' | sed 's/:.*//')

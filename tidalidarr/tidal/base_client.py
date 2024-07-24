@@ -75,10 +75,9 @@ class TidalBaseClient:
                 params=params,
             )
         except ClientResponseError as error:
-            if error.status == 401:
-                async with self._auth_lock:
-                    await self._verify_access_token()
-                    await self._test_download()
+            if error.status == 401 and HttpUrl(str(url)).path != "/v1/sessions":
+                await self._verify_access_token()
+                await self._test_download()
             raise
         return response
 
@@ -126,6 +125,8 @@ class TidalBaseClient:
             case (AuthState.ACCESS_TOKEN_EXPIRED, AuthState.LOGGED_IN):
                 self._auth_state = new_state
             case (AuthState.ACCESS_TOKEN_EXPIRED, AuthState.REFRESH_TOKEN_EXPIRED):
+                self._auth_state = new_state
+            case (AuthState.ACCESS_TOKEN_EXPIRED, AuthState.UNAUTHENTICATED):
                 self._auth_state = new_state
             case (AuthState.ACCESS_TOKEN_REFRESHED, AuthState.UNAUTHENTICATED):
                 self._auth_state = AuthState.SUBSCRIPTION_EXPIRED
