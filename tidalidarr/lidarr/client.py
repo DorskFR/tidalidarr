@@ -69,7 +69,7 @@ class LidarrClient:
             for record in records:
                 if record["albumType"] != "Album":
                     continue
-                if record["grabbed"]:
+                if record.get("grabbed"):  # https://github.com/Lidarr/Lidarr/issues/4824
                     continue
                 yield f'{record["artist"]["artistName"]} {record["title"]}'
             if len(records) < page_size:
