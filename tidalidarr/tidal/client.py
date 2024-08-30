@@ -6,7 +6,6 @@ import time
 from collections.abc import AsyncIterator
 from contextlib import suppress
 from pathlib import Path
-from random import randrange
 
 from aiohttp import ClientError, ClientSession
 
@@ -22,6 +21,7 @@ from tidalidarr.tidal.models import (
     TidalStream,
     TidalTrack,
 )
+from tidalidarr.utils import jitter_sleep
 
 logger = logging.getLogger(__name__)
 
@@ -226,7 +226,4 @@ class TidalClient(TidalBaseClient):
             shutil.move(temp_file.name, file_path)
             logger.info(f"📥 Saved {file_path}")
 
-        if self._config.sleep_between_downloads:
-            random_time = randrange(1000, 5000) / 1000
-            logger.info(f"😴 Sleeping {random_time:.2f} seconds")
-        await asyncio.sleep(random_time)
+        await jitter_sleep(self._config.sleep_between_downloads)

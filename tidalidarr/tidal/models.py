@@ -85,7 +85,8 @@ class TidalConfig(BaseSettings):
     country_code: str = "US"
     download_path: Path = Path("/downloads")
     lyrics_v1_url: HttpUrl = HttpUrl("https://listen.tidal.com/v1")
-    sleep_between_downloads: bool = True
+    sleep_between_downloads: float = 5
+    sleep_between_requests: float = 2
     token_path: Path = Path("token.json")
     test_track_id: int = 286926336
 

@@ -26,6 +26,7 @@ from tidalidarr.tidal.models import (
     TidalLoginWithDeviceFailedError,
     TidalToken,
 )
+from tidalidarr.utils import jitter_sleep
 
 logger = logging.getLogger(__name__)
 
@@ -60,8 +61,8 @@ class TidalBaseClient:
             params = (params or {}) | {"countryCode": self._config.country_code}
             headers = (headers or {}) | {"Authorization": f"Bearer {self._token.access_token}"}
 
-        # TODO: cheap rate limit to avoid 429, to improve
-        await asyncio.sleep(1)
+        # Cheap rate limit to avoid restriction
+        await jitter_sleep(self._config.sleep_between_requests)
 
         # Log the error and re raise
         try:
