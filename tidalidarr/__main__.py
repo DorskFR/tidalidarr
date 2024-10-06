@@ -85,8 +85,13 @@ async def periodic_check(tidal_client: TidalClient, lidarr_client: LidarrClient)
             await asyncio.sleep(60)
 
 
-async def healthz(_: Request) -> PlainTextResponse:
-    return PlainTextResponse(content="OK")
+async def healthz(request: Request) -> PlainTextResponse:
+    tidal_client: TidalClient = request.state.tidal_client
+    return (
+        PlainTextResponse(content="OK")
+        if tidal_client.is_logged_in
+        else PlainTextResponse(content="UNAUTHENTICATED", status_code=401)
+    )
 
 
 async def index(_request: Request) -> PlainTextResponse:

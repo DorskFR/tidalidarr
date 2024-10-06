@@ -39,6 +39,10 @@ class TidalBaseClient:
         self._auth_state: AuthState = AuthState.UNAUTHENTICATED
         self._auth_lock = asyncio.Lock()
 
+    @property
+    def is_logged_in(self) -> bool:
+        return self._auth_state is AuthState.LOGGED_IN
+
     async def _request(
         self,
         method: str,
@@ -173,9 +177,10 @@ class TidalBaseClient:
             logger.info("Logging in with device authorization")
             device_authorization = await self._get_device_authorization()
             logger.info(f"🌐 Please login at this URL: https://{device_authorization.verification_uri_complete}")
-            self._token = await self._login_with_device_code(device_authorization)
-            self._save_token(self._token)
-            self._config.country_code = self._token.user.country_code
+            token = await self._login_with_device_code(device_authorization)
+            self._save_token(token)
+            self._config.country_code = token.user.country_code
+            self._token = token
             logger.info("🎉 Now logged in")
             self._change_state(AuthState.LOGGED_IN)
         except ClientError as error:
