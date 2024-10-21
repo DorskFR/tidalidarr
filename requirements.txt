@@ -6,6 +6,6 @@ pydantic-settings~=2.6.0
 pydantic~=2.9.1
 pykakasi~=2.3.0
 sentry-sdk~=2.17.0
-starlette~=0.39.1
+starlette~=0.41.0
 tenacity~=9.0.0
 uvicorn~=0.32.0
