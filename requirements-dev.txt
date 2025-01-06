@@ -2,4 +2,4 @@
 mypy~=1.14.1
 pytest~=8.3.1
 ruff~=0.7.0
-vulture~=2.13.0
+vulture~=2.14.0
