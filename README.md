@@ -26,6 +26,8 @@ Credentials are then saved to `token.json` and refresh is automatic afterwards.
 - In the logs you will see a link pointing to tidal and requiring authentication
 - After the device is authorized, there is a ~30sc delay before authentication succeeds and the token is written to `token.json`
 
+The link to authorize can also be viewed at http://localhost:8000/auth
+
 ### Automatic download
 
 Tidalidarr queries your lidarr instance for missing albums and starts searching / downloading
