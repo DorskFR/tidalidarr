@@ -38,6 +38,7 @@ class TidalBaseClient:
         self._token: TidalToken | None = None
         self._auth_state: AuthState = AuthState.UNAUTHENTICATED
         self._auth_lock = asyncio.Lock()
+        self.auth_url = ""
 
     @property
     def is_logged_in(self) -> bool:
@@ -176,7 +177,9 @@ class TidalBaseClient:
         try:
             logger.info("Logging in with device authorization")
             device_authorization = await self._get_device_authorization()
-            logger.info(f"🌐 Please login at this URL: https://{device_authorization.verification_uri_complete}")
+            auth_url = f"https://{device_authorization.verification_uri_complete}"
+            self.auth_url = auth_url
+            logger.info(f"🌐 Please login at this URL: {auth_url}")
             token = await self._login_with_device_code(device_authorization)
             self._save_token(token)
             self._config.country_code = token.user.country_code

@@ -103,6 +103,15 @@ async def queue_info(request: Request) -> JSONResponse:
     return JSONResponse(content=json.loads(queue_information.json()))
 
 
+async def auth(request: Request) -> PlainTextResponse:
+    tidal_client: TidalClient = request.state.tidal_client
+    return (
+        PlainTextResponse(content="Logged in")
+        if tidal_client.is_logged_in
+        else PlainTextResponse(content=tidal_client.auth_url)
+    )
+
+
 async def get_album(request: Request) -> JSONResponse:
     tidal_client: TidalClient = request.state.tidal_client
     try:
@@ -117,6 +126,7 @@ async def get_album(request: Request) -> JSONResponse:
 app = Starlette(
     routes=[
         Route("/healthz", endpoint=healthz, methods=["GET"]),
+        Route("/auth", endpoint=auth, methods=["GET"]),
         Route("/album/{album_id}", endpoint=get_album, methods=["GET"]),
         Route("/queue", endpoint=queue_info, methods=["GET"]),
         Route("/", endpoint=index, methods=["GET"]),

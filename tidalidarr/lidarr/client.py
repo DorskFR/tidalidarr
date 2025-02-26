@@ -71,7 +71,7 @@ class LidarrClient:
                     continue
                 if record.get("grabbed"):  # https://github.com/Lidarr/Lidarr/issues/4824
                     continue
-                yield f'{record["artist"]["artistName"]} {record["title"]}'
+                yield f"{record['artist']['artistName']} {record['title']}"
             if len(records) < page_size:
                 break
             params["page"] += 1

@@ -79,7 +79,7 @@ class TidalClient(TidalBaseClient):
 
         search_result = await self._search(query)
         if not (album_id := search_result.top_hit_id):
-            logging.warn(f"Could not find an album for: {query}")
+            logging.warning(f"Could not find an album for: {query}")
             self._not_found[query] = time.time()
             return None
 
@@ -137,7 +137,7 @@ class TidalClient(TidalBaseClient):
                 logger.info(f"- {album.title}")
         if result.top_hit and result.top_hit_id:
             result_name = result.top_hit["value"].get("name") or result.top_hit["value"].get("title")
-            logger.info(f'Got a top hit of type {result.top_hit["type"]} with name {result_name}')
+            logger.info(f"Got a top hit of type {result.top_hit['type']} with name {result_name}")
 
     async def _download_album(self, album: TidalAlbum) -> None:
         """
