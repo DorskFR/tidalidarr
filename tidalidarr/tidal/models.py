@@ -80,8 +80,8 @@ class TidalConfig(BaseSettings):
     api_v1_url: HttpUrl = HttpUrl("https://api.tidal.com/v1")
     auth_url: HttpUrl = HttpUrl("https://auth.tidal.com/v1/oauth2")
     check_interval: int = 3600
-    client_id: str = "zU4XHVVkc2tDPo4t"
-    client_secret: str = "VJKhDFqJPqvsPVNBV6ukXTJmwlvbttP7wlMlrc72se4="  # noqa: S105, Possible hardcoded password
+    client_id: str
+    client_secret: str
     country_code: str = "US"
     download_path: Path = Path("/downloads")
     lyrics_v1_url: HttpUrl = HttpUrl("https://listen.tidal.com/v1")
