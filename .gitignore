@@ -3,3 +3,4 @@ venv
 .vscode
 token.json
 __pycache__
+.qa/

@@ -1,0 +1,15 @@
+{
+ "trackId": 286926336,
+ "assetPresentation": "FULL",
+ "audioMode": "STEREO",
+ "audioQuality": "LOSSLESS",
+ "manifestMimeType": "application/vnd.tidal.bts",
+ "manifestHash": "sha256:deadbeef",
+ "manifest": "eyJtaW1lVHlwZSI6ICJhdWRpby9mbGFjIiwgImNvZGVjcyI6ICJmbGFjIiwgImVuY3J5cHRpb25UeXBlIjogIk5PTkUiLCAidXJscyI6IFsiaHR0cHM6Ly9zcC1wci1mYS5hdWRpby50aWRhbC5jb20vbWVkaWF0cmFja3MvZXhhbXBsZS8wLmZsYWMiXX0=",
+ "albumReplayGain": -8.19,
+ "albumPeakAmplitude": 1.0,
+ "trackReplayGain": -8.19,
+ "trackPeakAmplitude": 1.0,
+ "bitDepth": 16,
+ "sampleRate": 44100
+}

@@ -33,6 +33,10 @@ class TidalAllAuthenticationFailedError(TidalAuthenticationError):
     """Raised when all authentication methods have failed"""
 
 
+class TidalInvalidStreamError(Exception):
+    """Raised when a stream does not contain the expected FLAC audio"""
+
+
 #
 # Enums
 #
@@ -50,6 +54,7 @@ class AuthState(Enum):
 
 class AudioQuality(StrEnum):
     HI_RES = "HI_RES"
+    HI_RES_LOSSLESS = "HI_RES_LOSSLESS"
     HIGH = "HIGH"
     LOSSLESS = "LOSSLESS"
     LOW = "LOW"
@@ -194,6 +199,24 @@ class TidalStream(TidalModel):
     @cached_property
     def url(self) -> HttpUrl:
         return next(iter(self.decoded_manifest.urls))
+
+    def check_flac_codec(self) -> None:
+        """
+        Tidal silently downgrades to AAC when the client or account is not allowed lossless.
+        Refuse anything that is not plain unencrypted FLAC instead of writing broken .flac files.
+        """
+        manifest = self.decoded_manifest
+        if self.audio_quality not in (AudioQuality.LOSSLESS, AudioQuality.HI_RES_LOSSLESS):
+            raise TidalInvalidStreamError(f"Track {self.track_id}: got quality {self.audio_quality}, not lossless")
+        if manifest.codecs != "flac":
+            raise TidalInvalidStreamError(f"Track {self.track_id}: got codecs {manifest.codecs}, expected flac")
+        if manifest.encryption_type != "NONE":
+            raise TidalInvalidStreamError(f"Track {self.track_id}: stream is encrypted ({manifest.encryption_type})")
+
+
+def check_flac_magic(track_bytes: bytes, track_id: int) -> None:
+    if not track_bytes.startswith(b"fLaC"):
+        raise TidalInvalidStreamError(f"Track {track_id}: downloaded bytes are not a FLAC file")
 
 
 class TidalTrack(TidalModel):

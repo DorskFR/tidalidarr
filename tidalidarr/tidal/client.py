@@ -20,6 +20,7 @@ from tidalidarr.tidal.models import (
     TidalSearchResult,
     TidalStream,
     TidalTrack,
+    check_flac_magic,
 )
 from tidalidarr.utils import jitter_sleep
 
@@ -214,9 +215,12 @@ class TidalClient(TidalBaseClient):
             return
         file_path.relative_to(folder)
 
+        track_stream.check_flac_codec()
+
         logger.info(f"⚡️ Now downloading: {track.name}")
         resp = await self._request("GET", track_stream.url)
         track_bytes = await resp.content.read()
+        check_flac_magic(track_bytes, track.id)
         lyrics: str | None = await self._get_track_lyrics(track.id)
 
         with tempfile.NamedTemporaryFile() as temp_file:
