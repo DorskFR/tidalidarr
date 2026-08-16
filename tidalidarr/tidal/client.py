@@ -87,7 +87,7 @@ class TidalClient(TidalBaseClient):
         if query in self._not_found:
             del self._not_found[query]
 
-        album = next(a for a in search_result.albums if a.id == album_id)
+        album = next((a for a in search_result.albums if a.id == album_id), None) or await self.find_album(album_id)
         await self.enqueue_album(album)
         return album.folder
 
