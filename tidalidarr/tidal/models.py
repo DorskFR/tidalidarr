@@ -4,13 +4,13 @@ from datetime import date
 from enum import Enum, StrEnum, auto
 from functools import cached_property
 from pathlib import Path
-from typing import Any, Literal
+from typing import Annotated, Any, Literal
 from uuid import UUID
 
 import mutagen
 import mutagen.flac
 import mutagen.id3
-from pydantic import BaseModel, ConfigDict, EmailStr, HttpUrl, model_validator
+from pydantic import BaseModel, BeforeValidator, ConfigDict, EmailStr, HttpUrl, model_validator
 from pydantic.alias_generators import to_camel
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -127,10 +127,18 @@ class TidalToken(TidalModel):
     user: TidalUser
 
 
+def _empty_str_to_none(value: Any) -> Any:
+    """Tidal sends "" instead of null for missing images."""
+    return None if value == "" else value
+
+
+OptionalUUID = Annotated[UUID | None, BeforeValidator(_empty_str_to_none)]
+
+
 class TidalArtistStub(TidalModel):
     id: int
     name: str
-    picture: UUID | None = None
+    picture: OptionalUUID = None
 
 
 class TidalArtist(TidalArtistStub):
@@ -140,7 +148,7 @@ class TidalArtist(TidalArtistStub):
 class TidalAlbumStub(TidalModel):
     id: int
     title: str
-    cover: UUID
+    cover: OptionalUUID = None
 
 
 class TidalAlbum(TidalAlbumStub):
@@ -164,6 +172,8 @@ class TidalAlbum(TidalAlbumStub):
 
     @cached_property
     def cover_urls(self) -> list[HttpUrl]:
+        if not self.cover:
+            return []
         cover_path = str(self.cover).replace("-", "/")
         return [
             HttpUrl(f"https://resources.tidal.com/images/{cover_path}/{size}x{size}.jpg") for size in [640, 320, 160]

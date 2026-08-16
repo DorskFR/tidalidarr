@@ -66,3 +66,23 @@ def test_check_flac_magic() -> None:
     check_flac_magic(b"fLaC\x00\x00\x00\x22", track_id=1)
     with pytest.raises(TidalInvalidStreamError):
         check_flac_magic(b"\x00\x00\x00\x1cftypisom", track_id=1)
+
+
+def test_parse_search_result_with_empty_image_fields() -> None:
+    with Path("tests/tidal/data/search.json").open(mode="r", encoding="utf-8") as p:
+        content = json.load(p)
+    content["artists"]["items"][0]["picture"] = ""
+    content["albums"]["items"][0]["cover"] = ""
+
+    parsed = TidalSearchResult(**content)
+
+    assert parsed.artists[0].picture is None
+    assert parsed.albums[0].cover is None
+
+
+def test_album_without_cover_has_no_cover_urls() -> None:
+    with Path("tests/tidal/data/album.json").open(mode="r", encoding="utf-8") as p:
+        content = json.load(p)
+    content["cover"] = ""
+
+    assert TidalAlbum(**content).cover_urls == []
