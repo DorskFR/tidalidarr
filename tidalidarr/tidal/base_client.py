@@ -82,8 +82,7 @@ class TidalBaseClient:
             )
         except ClientResponseError as error:
             if error.status == 401 and HttpUrl(str(url)).path != "/v1/sessions":
-                await self._verify_access_token()
-                await self._test_download()
+                await self._check_session()
             raise
         return response
 
@@ -93,8 +92,7 @@ class TidalBaseClient:
                 self._load_token()
 
             if self._auth_state is AuthState.TOKEN_PRESENT:
-                await self._verify_access_token()
-                await self._test_download()
+                await self._check_session()
 
             if self._auth_state is AuthState.UNAUTHENTICATED:
                 await self._login()
@@ -111,6 +109,12 @@ class TidalBaseClient:
         except TidalAuthenticationError:
             logger.exception("❌ Authentication failed")
             raise
+
+    async def _check_session(self) -> None:
+        """An expired access token must go through the refresh path, not fail the subscription test."""
+        await self._verify_access_token()
+        if self._auth_state is AuthState.LOGGED_IN:
+            await self._test_download()
 
     def _change_state(self, new_state: AuthState) -> None:
         if self._auth_state == new_state:
