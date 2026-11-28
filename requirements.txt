@@ -9,4 +9,4 @@ pykakasi~=2.3.0
 sentry-sdk~=2.77.0
 starlette~=1.10.0
 tenacity~=9.2.1
-uvicorn~=0.54.0
+uvicorn~=0.55.0
