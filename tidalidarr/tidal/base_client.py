@@ -138,6 +138,12 @@ class TidalBaseClient:
                 self._auth_state = new_state
             case (AuthState.ACCESS_TOKEN_EXPIRED, AuthState.UNAUTHENTICATED):
                 self._auth_state = new_state
+            case (AuthState.ACCESS_TOKEN_EXPIRED, AuthState.ACCESS_TOKEN_REFRESHED):
+                self._auth_state = new_state
+            case (AuthState.ACCESS_TOKEN_REFRESHED, AuthState.LOGGED_IN):
+                self._auth_state = new_state
+            case (AuthState.ACCESS_TOKEN_REFRESHED, AuthState.ACCESS_TOKEN_EXPIRED):
+                self._auth_state = new_state
             case (AuthState.ACCESS_TOKEN_REFRESHED, AuthState.UNAUTHENTICATED):
                 self._auth_state = AuthState.SUBSCRIPTION_EXPIRED
             case (AuthState.REFRESH_TOKEN_EXPIRED, AuthState.LOGGED_IN):

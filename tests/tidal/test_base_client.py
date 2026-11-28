@@ -1,9 +1,11 @@
 import asyncio
+import json
+from pathlib import Path
 
-from aiohttp import ClientSession
+from aiohttp import ClientResponseError, ClientSession
 
 from tidalidarr.tidal.client import TidalClient
-from tidalidarr.tidal.models import AuthState, TidalConfig
+from tidalidarr.tidal.models import AuthState, TidalConfig, TidalToken
 
 
 def _client(session: ClientSession) -> TidalClient:
@@ -65,3 +67,56 @@ def test_an_unsubscribed_account_falls_back_to_device_login() -> None:
     state, calls = _run_ensure(access_token_valid=True, subscribed=False)
     assert state is AuthState.LOGGED_IN
     assert calls == ["verify", "test_download", "device_login"]
+
+
+class _Response:
+    status = 200
+
+    def __init__(self, payload: dict[str, object] | None = None) -> None:
+        self._payload = payload or {}
+
+    async def json(self) -> dict[str, object]:
+        return self._payload
+
+    async def text(self) -> str:
+        return ""
+
+
+def test_the_real_refresh_path_reaches_logged_in(tmp_path: Path) -> None:
+    async def run() -> tuple[AuthState, str]:
+        async with ClientSession() as session:
+            config = TidalConfig(client_id="id", client_secret="secret", token_path=tmp_path / "token.json")  # noqa: S106
+            client = TidalClient(config, session)
+            client._token = TidalToken(**TOKEN)  # noqa: SLF001
+            client._auth_state = AuthState.TOKEN_PRESENT  # noqa: SLF001
+
+            async def request(_method: str, _url: str, **_kwargs: object) -> _Response:
+                assert client._token  # noqa: SLF001
+                if client._token.access_token == TOKEN["access_token"]:  # noqa: SLF001
+                    raise ClientResponseError(None, (), status=401)  # type: ignore[arg-type]
+                return _Response()
+
+            async def post(_url: str, **_kwargs: object) -> _Response:
+                return _Response({"access_token": "fresh", "expires_in": 604800})
+
+            client._request = request  # type: ignore[method-assign, assignment] # noqa: SLF001
+            client._session.post = post  # type: ignore[method-assign, assignment] # noqa: SLF001
+            await client.login()
+            saved = json.loads((tmp_path / "token.json").read_text(encoding="utf-8"))
+            return client._auth_state, saved["access_token"]  # noqa: SLF001
+
+    state, saved = asyncio.run(run())
+    assert state is AuthState.LOGGED_IN
+    assert saved == "fresh"
+
+
+TOKEN = {
+    "access_token": "expired",
+    "client_name": "c",
+    "expires_in": 1,
+    "refresh_token": "r",
+    "scope": "s",
+    "token_type": "Bearer",
+    "user_id": 1,
+    "user": {"country_code": "JP", "email": "a@example.com", "user_id": 1, "username": "u"},
+}
