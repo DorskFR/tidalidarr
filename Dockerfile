@@ -12,7 +12,10 @@ ENV IMAGE_VERSION=${VERSION}
 WORKDIR /usr/src/app
 COPY --from=build /usr/local/lib/python${PYTHON_VERSION}/site-packages/ /usr/local/lib/python${PYTHON_VERSION}/site-packages/
 COPY $PROJECT_NAME $PROJECT_NAME
-RUN echo $VERSION > ./VERSION && \
+RUN apt-get update && \
+    apt-get upgrade -y --no-install-recommends && \
+    rm -rf /var/lib/apt/lists/* && \
+    echo $VERSION > ./VERSION && \
     echo '#!/bin/sh\nexec python -m "'$PROJECT_NAME'"' > entrypoint.sh && \
     chmod +x entrypoint.sh && \
     addgroup --gid 1000 $PROJECT_NAME && \
