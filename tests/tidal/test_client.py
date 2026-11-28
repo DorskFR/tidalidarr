@@ -29,7 +29,7 @@ def _search(
     search_result: TidalSearchResult,
     find_album: Callable[[int], Coroutine[Any, Any, TidalAlbum]],
 ) -> Path | None:
-    async def fake_search(query: str) -> TidalSearchResult:  # noqa: ARG001
+    async def fake_search(query: str, types: str | None = None, limit: int | None = None) -> TidalSearchResult:  # noqa: ARG001
         return search_result
 
     async def run() -> Path | None:

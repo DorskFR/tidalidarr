@@ -14,7 +14,7 @@ from pydantic import BaseModel, BeforeValidator, ConfigDict, EmailStr, HttpUrl, 
 from pydantic.alias_generators import to_camel
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from tidalidarr.utils import sanitize
+from tidalidarr.utils import sanitize, similarity
 
 #
 # Errors
@@ -93,6 +93,8 @@ class TidalConfig(BaseSettings):
     sleep_between_downloads: float = 5
     sleep_between_requests: float = 2
     token_path: Path = Path("token.json")
+    grabs_path: Path = Path("grabs.json")
+    max_attempts: int = 3
     test_track_id: int = 286926336
 
 
@@ -152,6 +154,8 @@ class TidalAlbumStub(TidalModel):
 
 
 class TidalAlbum(TidalAlbumStub):
+    version: str | None = None
+    upc: str | None = None
     duration: int
     allow_streaming: bool
     number_of_tracks: int
@@ -161,6 +165,14 @@ class TidalAlbum(TidalAlbumStub):
     artists: list[TidalArtistStub]
     release_date: date | None = None
     cover_bytes: bytes | None = None
+
+    @cached_property
+    def full_title(self) -> str:
+        return f"{self.title} ({self.version})" if self.version and self.version not in self.title else self.title
+
+    @cached_property
+    def artist(self) -> str:
+        return next(iter(self.artists)).name
 
     @cached_property
     def release_date_str(self) -> str:
@@ -329,3 +341,43 @@ class TidalQueueInformation(BaseModel):
     ready_count: int
     not_found: list[str]
     not_found_count: int
+
+
+class TidalGrabCancelledError(Exception):
+    """Raised inside a download when its grab was cancelled"""
+
+
+class AlbumCandidate(BaseModel):
+    id: str
+    title: str
+    artist: str
+    year: int | None
+    tracks: int
+    duration: int
+    quality: AudioQuality
+    upc: str | None
+    info_url: str
+    confidence: float
+
+    @classmethod
+    def score(cls, album: TidalAlbum, artist: str, title: str, year: int | None) -> "AlbumCandidate":
+        album_year = album.release_date.year if album.release_date else None
+        title_score = max(similarity(album.title, title), similarity(album.full_title, title))
+        artist_score = max((similarity(a.name, artist) for a in album.artists), default=0.0)
+        confidence = 0.5 * title_score + 0.35 * artist_score
+        if year and album_year:
+            confidence += 0.1 if year == album_year else 0.05 if abs(year - album_year) == 1 else 0.0
+        if album.audio_quality in (AudioQuality.LOSSLESS, AudioQuality.HI_RES_LOSSLESS):
+            confidence += 0.05
+        return cls(
+            id=str(album.id),
+            title=album.full_title,
+            artist=album.artist,
+            year=album_year,
+            tracks=album.number_of_tracks,
+            duration=album.duration,
+            quality=album.audio_quality,
+            upc=album.upc,
+            info_url=str(album.url),
+            confidence=round(min(confidence, 1.0), 4),
+        )

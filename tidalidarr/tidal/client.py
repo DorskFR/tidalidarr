@@ -9,31 +9,46 @@ from pathlib import Path
 
 from aiohttp import ClientError, ClientSession
 
+from tidalidarr.grabs import GrabJob, GrabStatus, GrabStore
 from tidalidarr.tidal.base_client import TidalBaseClient
 from tidalidarr.tidal.models import (
+    AlbumCandidate,
     AssetPresentation,
     AudioQuality,
     PlaybackMode,
     TidalAlbum,
     TidalConfig,
+    TidalGrabCancelledError,
     TidalQueueInformation,
     TidalSearchResult,
     TidalStream,
     TidalTrack,
     check_flac_magic,
 )
-from tidalidarr.utils import jitter_sleep
+from tidalidarr.utils import contains_japanese, jitter_sleep, romanize
 
 logger = logging.getLogger(__name__)
 
 
+ALBUM_ITEMS_PAGE = 100
+
+
 class TidalClient(TidalBaseClient):
-    def __init__(self, config: TidalConfig, session: ClientSession) -> None:
+    def __init__(
+        self,
+        config: TidalConfig,
+        session: ClientSession,
+        grabs: GrabStore | None = None,
+        *,
+        track_ready: bool = True,
+    ) -> None:
         super().__init__(config, session)
         self._not_found: dict[str, float] = {}
         self._download_queue: asyncio.Queue[TidalAlbum] = asyncio.Queue()
         self._ready_queue: asyncio.Queue[Path] = asyncio.Queue()
         self._enqueued: set[int] = set()
+        self._track_ready = track_ready
+        self.grabs = grabs or GrabStore()
 
     def get_queue_information(self) -> TidalQueueInformation:
         albums = list(self._download_queue._queue)  # type: ignore[attr-defined] # noqa: SLF001
@@ -49,17 +64,98 @@ class TidalClient(TidalBaseClient):
             not_found_count=len(not_found),
         )
 
+    async def login(self) -> None:
+        async with self._auth_lock:
+            await self._ensure_authenticated()
+
+    async def resume_pending(self) -> None:
+        for job in self.grabs.pending():
+            try:
+                album = await self.find_album(job.album_id)
+            except ClientError as error:
+                logger.warning(f"Could not resume grab {job.id}: {error}")
+                self.grabs.update(job.id, status=GrabStatus.FAILED, error=str(error))
+                continue
+            self.grabs.update(job.id, status=GrabStatus.QUEUED)
+            await self._download_queue.put(album)
+            logger.info(f"Resumed grab {job.id} - {job.title}")
+
     async def process_queue(self) -> None:
         while True:
+            album = await self._download_queue.get()
+            job_id = str(album.id)
+            job = self.grabs.get(job_id)
+            if not job or job.status is not GrabStatus.QUEUED:
+                continue
+            attempts = job.attempts + 1
+            self.grabs.update(job_id, status=GrabStatus.DOWNLOADING, attempts=attempts, error=None)
             try:
-                album = self._download_queue.get_nowait()
                 await self._download_album(album)
+            except TidalGrabCancelledError:
+                logger.info(f"Grab {job_id} - {album.title} cancelled")
+                continue
+            except Exception as error:
+                logger.exception(f"Error while downloading {album.title} (attempt {attempts})")
+                if attempts < self._config.max_attempts:
+                    self.grabs.update(job_id, status=GrabStatus.QUEUED, error=str(error))
+                    self._download_queue.put_nowait(album)
+                else:
+                    self.grabs.update(job_id, status=GrabStatus.FAILED, error=str(error))
+                continue
+            output = self._config.download_path / album.folder
+            self.grabs.update(job_id, status=GrabStatus.COMPLETED, output_path=output.as_posix())
+            if self._track_ready:
                 await self._ready_queue.put(album.folder)
-            except asyncio.QueueEmpty:
-                await asyncio.sleep(1)
-            except Exception:
-                self._download_queue.put_nowait(album)
-                logger.exception("Unexpected error while processing queue")
+
+    def grab(self, album: TidalAlbum) -> GrabJob:
+        """Queue a download of `album` unless one is running or already landed on disk."""
+        job_id = str(album.id)
+        existing = self.grabs.get(job_id)
+        if existing and existing.status.is_active:
+            return existing
+        if (
+            existing
+            and existing.status is GrabStatus.COMPLETED
+            and (self._config.download_path / album.folder).exists()
+        ):
+            return existing
+        job = self.grabs.put(
+            GrabJob(
+                id=job_id,
+                album_id=album.id,
+                title=album.full_title,
+                artist=album.artist,
+                tracks_total=album.number_of_tracks,
+            )
+        )
+        self._download_queue.put_nowait(album)
+        logger.info(f"Grab {job_id} - {album.title} added to download queue")
+        return job
+
+    def cancel_grab(self, job_id: str) -> GrabJob | None:
+        """Cancel an active grab; forget a finished one."""
+        job = self.grabs.get(job_id)
+        if job is None:
+            return None
+        if job.status.is_active:
+            self._enqueued.discard(job.album_id)
+            return self.grabs.update(job_id, status=GrabStatus.CANCELLED)
+        self.grabs.remove(job_id)
+        return job
+
+    def _is_cancelled(self, album_id: int) -> bool:
+        job = self.grabs.get(str(album_id))
+        return job is not None and job.status is GrabStatus.CANCELLED
+
+    async def search_albums(self, artist: str, title: str, year: int | None = None) -> list[AlbumCandidate]:
+        query = f"{artist} {title}".strip()
+        result = await self._search(query, types="ALBUMS", limit=25)
+        if not result.albums and contains_japanese(query):
+            result = await self._search(romanize(query), types="ALBUMS", limit=25)
+        candidates = [
+            AlbumCandidate.score(album, artist, title, year) for album in result.albums if album.allow_streaming
+        ]
+        return sorted(candidates, key=lambda c: c.confidence, reverse=True)
 
     async def get_ready_paths(self) -> AsyncIterator[Path]:
         while True:
@@ -100,21 +196,25 @@ class TidalClient(TidalBaseClient):
 
     async def enqueue_album(self, album: TidalAlbum) -> str:
         if album.id not in self._enqueued:
-            await self._download_queue.put(album)
             self._enqueued.add(album.id)
+            self.grab(album)
             result = f"Album {album.id} - {album.title} added to download queue"
         else:
             result = f"Album {album.id} - {album.title} is already in queue"
         logger.info(result)
         return result
 
-    async def _search(self, query: str) -> TidalSearchResult:
+    async def _search(self, query: str, types: str | None = None, limit: int | None = None) -> TidalSearchResult:
         """
         Trigger a search to Tidal's API using a query string built with Artist + release name
         If found, we return the search model with all the parsed fields.
         """
         logger.info(f"🔍 Searching for: {query}")
-        params = {"query": query, "countryCode": self._config.country_code}
+        params: dict[str, str | int] = {"query": query, "countryCode": self._config.country_code}
+        if types:
+            params["types"] = types
+        if limit:
+            params["limit"] = limit
         url = f"{self._config.api_hifi_url}/search"
         resp = await self._request("GET", url, params=params, with_auth_headers=True)
         content = await resp.json()
@@ -150,16 +250,40 @@ class TidalClient(TidalBaseClient):
         logger.info(f"💿 Downloading album: {album.title}")
         album.cover_bytes = await self._get_album_cover(album)
         track_list = await self._get_track_list(album)
-        for track in track_list:
+        job_id = str(album.id)
+        self.grabs.update(job_id, tracks_total=len(track_list), tracks_done=0)
+        written: list[Path] = []
+        for done, track in enumerate(track_list, start=1):
+            if self._is_cancelled(album.id):
+                self._discard(written)
+                raise TidalGrabCancelledError(job_id)
             track_stream = await self._get_track_stream(track.id)
-            await self._download_track(album, track, track_stream)
+            if path := await self._download_track(album, track, track_stream):
+                written.append(path)
+            self.grabs.update(job_id, tracks_done=done)
         logger.info(f"Finished downloading album: {album.title}")
+
+    @staticmethod
+    def _discard(paths: list[Path]) -> None:
+        for path in paths:
+            path.unlink(missing_ok=True)
+        if paths:
+            with suppress(OSError):
+                paths[0].parent.rmdir()
 
     async def _get_track_list(self, album: TidalAlbum) -> list[TidalTrack]:
         url = f"{self._config.api_hifi_url}/albums/{album.id}/items"
-        response = await self._request("GET", url, params={"limit": 100}, with_auth_headers=True)
-        content = await response.json()
-        track_list = [TidalTrack(**item["item"]) for item in content["items"]]
+        track_list: list[TidalTrack] = []
+        offset = 0
+        while True:
+            params = {"limit": ALBUM_ITEMS_PAGE, "offset": offset}
+            response = await self._request("GET", url, params=params, with_auth_headers=True)
+            content = await response.json()
+            items = content["items"]
+            track_list.extend(TidalTrack(**item["item"]) for item in items if item.get("type", "track") == "track")
+            offset += len(items)
+            if not items or offset >= content.get("totalNumberOfItems", 0):
+                break
         logger.info(f"Album {album.title} ({album.id}) has {len(track_list)} tracks")
         return track_list
 
@@ -196,7 +320,7 @@ class TidalClient(TidalBaseClient):
             lyrics = content["lyrics"]
         return lyrics
 
-    async def _download_track(self, album: TidalAlbum, track: TidalTrack, track_stream: TidalStream) -> None:
+    async def _download_track(self, album: TidalAlbum, track: TidalTrack, track_stream: TidalStream) -> Path | None:
         """
         Download logic:
         - Prepare the path (noop if exists)
@@ -212,7 +336,7 @@ class TidalClient(TidalBaseClient):
         file_path = folder / track.name
         if file_path.exists():
             logger.info(f"👯‍♀️ File exists: {file_path}")
-            return
+            return None
         file_path.relative_to(folder)
 
         track_stream.check_flac_codec()
@@ -231,3 +355,4 @@ class TidalClient(TidalBaseClient):
             logger.info(f"📥 Saved {file_path}")
 
         await jitter_sleep(self._config.sleep_between_downloads)
+        return file_path
