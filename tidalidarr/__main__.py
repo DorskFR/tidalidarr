@@ -59,7 +59,7 @@ async def lifespan(_app: Starlette) -> AsyncIterator[State]:
         )
         lidarr_client = LidarrClient(lidarr_config, session) if lidarr_config.enabled else None
         task_handles = {
-            asyncio.create_task(startup(tidal_client)),
+            asyncio.create_task(keep_logged_in(tidal_client)),
             asyncio.create_task(tidal_client.process_queue()),
         }
         if lidarr_client:
@@ -82,17 +82,21 @@ async def lifespan(_app: Starlette) -> AsyncIterator[State]:
                     handle.cancel()
 
 
-async def startup(tidal_client: TidalClient) -> None:
-    while not tidal_client.is_logged_in:
-        try:
-            await tidal_client.login()
-        except Exception:
-            logger.exception("Tidal login failed, retrying in 60 seconds")
-            await asyncio.sleep(60)
-    try:
-        await tidal_client.resume_pending()
-    except Exception:
-        logger.exception("Resuming pending grabs failed")
+async def keep_logged_in(tidal_client: TidalClient) -> None:
+    resumed = False
+    while True:
+        if not tidal_client.is_logged_in:
+            try:
+                await tidal_client.login()
+            except Exception:
+                logger.exception("Tidal login failed, retrying in 60 seconds")
+        if tidal_client.is_logged_in and not resumed:
+            resumed = True
+            try:
+                await tidal_client.resume_pending()
+            except Exception:
+                logger.exception("Resuming pending grabs failed")
+        await asyncio.sleep(60)
 
 
 async def periodic_check(tidal_client: TidalClient, lidarr_client: LidarrClient) -> None:
