@@ -16,6 +16,8 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse, PlainTextResponse
 from starlette.routing import Route
 
+from tidalidarr import api
+from tidalidarr.grabs import GrabStore
 from tidalidarr.lidarr.client import LidarrClient, LidarrConfig
 from tidalidarr.tidal.client import TidalClient
 from tidalidarr.tidal.models import TidalConfig
@@ -37,7 +39,8 @@ sentry_sdk.init(
 class State(TypedDict):
     session: ClientSession
     tidal_client: TidalClient
-    lidarr_client: LidarrClient
+    lidarr_client: LidarrClient | None
+    api_config: api.ApiConfig
     background_tasks: set[asyncio.Task]
 
 
@@ -46,23 +49,50 @@ async def lifespan(_app: Starlette) -> AsyncIterator[State]:
     async with ClientSession(
         headers={"User-Agent": USER_AGENT}, raise_for_status=True, timeout=ClientTimeout(60)
     ) as session:
-        tidal_client = TidalClient(TidalConfig(), session)
-        lidarr_client = LidarrClient(LidarrConfig(), session)
+        tidal_config = TidalConfig()
+        lidarr_config = LidarrConfig()
+        if lidarr_config.enabled and not lidarr_config.api_key:
+            raise RuntimeError("LIDARR_API_KEY is required unless LIDARR_ENABLED=false")
+        api_config = api.ApiConfig()
+        tidal_client = TidalClient(
+            tidal_config, session, GrabStore(tidal_config.grabs_path), track_ready=lidarr_config.enabled
+        )
+        lidarr_client = LidarrClient(lidarr_config, session) if lidarr_config.enabled else None
         task_handles = {
-            asyncio.create_task(periodic_check(tidal_client, lidarr_client)),
+            asyncio.create_task(startup(tidal_client)),
             asyncio.create_task(tidal_client.process_queue()),
         }
+        if lidarr_client:
+            task_handles.add(asyncio.create_task(periodic_check(tidal_client, lidarr_client)))
+        else:
+            logger.info("Lidarr sync disabled")
+        if not api_config.api_key:
+            logger.warning("TIDALIDARR_API_KEY is not set, search and grab API disabled")
         try:
             yield {
                 "session": session,
                 "tidal_client": tidal_client,
                 "lidarr_client": lidarr_client,
+                "api_config": api_config,
                 "background_tasks": task_handles,
             }
         finally:
             for handle in task_handles:
                 with contextlib.suppress(asyncio.CancelledError):
                     handle.cancel()
+
+
+async def startup(tidal_client: TidalClient) -> None:
+    while not tidal_client.is_logged_in:
+        try:
+            await tidal_client.login()
+        except Exception:
+            logger.exception("Tidal login failed, retrying in 60 seconds")
+            await asyncio.sleep(60)
+    try:
+        await tidal_client.resume_pending()
+    except Exception:
+        logger.exception("Resuming pending grabs failed")
 
 
 async def periodic_check(tidal_client: TidalClient, lidarr_client: LidarrClient) -> None:
@@ -129,6 +159,11 @@ app = Starlette(
         Route("/auth", endpoint=auth, methods=["GET"]),
         Route("/album/{album_id}", endpoint=get_album, methods=["GET"]),
         Route("/queue", endpoint=queue_info, methods=["GET"]),
+        Route("/health", endpoint=api.health, methods=["GET"]),
+        Route("/search", endpoint=api.search, methods=["POST"]),
+        Route("/grabs", endpoint=api.create_grab, methods=["POST"]),
+        Route("/grabs/{grab_id}", endpoint=api.get_grab, methods=["GET"]),
+        Route("/grabs/{grab_id}", endpoint=api.delete_grab, methods=["DELETE"]),
         Route("/", endpoint=index, methods=["GET"]),
     ],
     lifespan=lifespan,

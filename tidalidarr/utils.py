@@ -1,6 +1,8 @@
 import asyncio
 import logging
 import re
+import unicodedata
+from difflib import SequenceMatcher
 from random import randrange
 
 import pykakasi
@@ -13,6 +15,7 @@ USER_AGENT = (
 )
 
 PATTERN = re.compile(r'[\/\\:\*\?"<>\|]')
+NON_WORD = re.compile(r"[\W_]+")
 
 
 def sanitize(text: str) -> str:
@@ -32,3 +35,11 @@ async def jitter_sleep(sleep_time: float) -> None:
     random_time = randrange(int(sleep_time * 1000 * 0.8), int(sleep_time * 1000 * 1.2)) / 1000
     logger.info(f"😴 Sleeping {random_time:.2f} seconds")
     await asyncio.sleep(random_time)
+
+
+def normalize(text: str) -> str:
+    return NON_WORD.sub(" ", unicodedata.normalize("NFKC", text).casefold()).strip()
+
+
+def similarity(left: str, right: str) -> float:
+    return SequenceMatcher(None, normalize(left), normalize(right)).ratio()

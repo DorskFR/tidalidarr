@@ -44,6 +44,30 @@ You can also use curl with a simple GET to add multiple albums. ex:
 curl http://localhost:8000/album/1234
 ```
 
+## Search and grab API
+
+Tidalidarr can also act as an external downloader: a media manager searches it like an indexer and hands it grabs like a download client.
+Set `TIDALIDARR_API_KEY` to enable it; every call needs the `X-Api-Key` header.
+Set `LIDARR_ENABLED=false` to run only the API.
+
+| Route               | Body                       | Returns                                                                                   |
+| ------------------- | -------------------------- | ----------------------------------------------------------------------------------------- |
+| `GET /health`       |                            | `{logged_in, auth_url}`                                                                   |
+| `POST /search`      | `{artist, album, year?}`   | Albums best first: `{id, title, artist, year, tracks, duration, quality, upc, info_url, confidence}` |
+| `POST /grabs`       | `{id}` (album id)          | `202` with the grab job                                                                   |
+| `GET /grabs/{id}`   |                            | `{id, status, progress, tracks_done, tracks_total, error, output_path, ...}`              |
+| `DELETE /grabs/{id}`|                            | `204`: cancels an active grab (removing its files) or forgets a finished one              |
+
+Status is one of `queued`, `downloading`, `completed`, `failed`, `cancelled`.
+`output_path` is set once completed. Search and grab answer `503` while Tidal is not logged in.
+Jobs are kept in `TIDAL_GRABS_PATH` and resumed on restart; a download is retried `TIDAL_MAX_ATTEMPTS` times before failing.
+
+```bash
+curl -H "X-Api-Key: $KEY" -d '{"artist": "Sekai No Owari", "album": "Scent of Memory"}' http://localhost:8000/search
+curl -H "X-Api-Key: $KEY" -d '{"id": "190865929"}' http://localhost:8000/grabs
+curl -H "X-Api-Key: $KEY" http://localhost:8000/grabs/190865929
+```
+
 ## Checking the queue
 
 You can check the current state (queued, ready, not found) by calling your instance at `/queue` endpoint.
@@ -61,10 +85,13 @@ The main variables that might require changes are:
 
 | Variable                  | Required | Default                      | Description                                         |
 | ------------------------- | -------- | ---------------------------- | --------------------------------------------------- |
-| `LIDARR_API_KEY`          | `Yes`    |                              | Lidarr API key                                      |
+| `LIDARR_ENABLED`          | `No`     | true                         | Sync Lidarr's missing albums                        |
+| `LIDARR_API_KEY`          | `Yes`    |                              | Lidarr API key (only when `LIDARR_ENABLED`)         |
 | `LIDARR_API_URL`          | `Yes`    | http://127.0.0.1:8686/api/v1 | Lidarr API endpoint                                 |
 | `TIDAL_DOWNLOAD_PATH`     | `No`     | /downloads                   | Persistent storage to save music files              |
 | `TIDAL_TOKEN_PATH`        | `No`     | token.json                   | Persistent storage to save the authentication token |
+| `TIDAL_GRABS_PATH`        | `No`     | grabs.json                   | Persistent storage for grab jobs                    |
+| `TIDALIDARR_API_KEY`      | `No`     |                              | Enables the search and grab API                     |
 | `TIDALIDARR_UVICORN_PORT` | `No`     | 8000                         | Port on which uvicorn should bind                   |
 | `LOG_LEVEL`               | `No`     |                              | Python log levels: DEBUG, INFO, WARNING, ERROR      |
 
