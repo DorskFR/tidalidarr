@@ -56,11 +56,33 @@ class TidalBaseClient:
         *,
         with_auth_headers: bool = False,
     ) -> ClientResponse:
-        if HttpUrl(str(url)).path != "/v1/sessions":
+        is_session_check = HttpUrl(str(url)).path == "/v1/sessions"
+        if not is_session_check:
             async with self._auth_lock:
                 await self._ensure_authenticated()
+        request = {"auth": auth, "data": data, "json": json, "params": params, "headers": headers}
+        try:
+            return await self._send(method, url, request, with_auth_headers=with_auth_headers)
+        except ClientResponseError as error:
+            if error.status != 401 or is_session_check:
+                raise
+            stale = self._access_token
+            async with self._auth_lock:
+                if self._access_token == stale:
+                    await self._check_session()
+                await self._ensure_authenticated()
+            if not with_auth_headers or self._access_token == stale:
+                raise
+        return await self._send(method, url, request, with_auth_headers=True)
 
-        # Insert auth headers if the request should be authenticated
+    @property
+    def _access_token(self) -> str | None:
+        return self._token.access_token if self._token else None
+
+    async def _send(
+        self, method: str, url: HttpUrl | str, request: dict[str, Any], *, with_auth_headers: bool
+    ) -> ClientResponse:
+        params, headers = request["params"], request["headers"]
         if with_auth_headers:
             assert self._token
             params = (params or {}) | {"countryCode": self._config.country_code}
@@ -68,23 +90,15 @@ class TidalBaseClient:
 
         # Cheap rate limit to avoid restriction
         await jitter_sleep(self._config.sleep_between_requests)
-
-        # Log the error and re raise
-        try:
-            response = await self._session.request(
-                method,
-                str(url),
-                auth=auth,
-                data=data,
-                headers=headers,
-                json=json,
-                params=params,
-            )
-        except ClientResponseError as error:
-            if error.status == 401 and HttpUrl(str(url)).path != "/v1/sessions":
-                await self._check_session()
-            raise
-        return response
+        return await self._session.request(
+            method,
+            str(url),
+            auth=request["auth"],
+            data=request["data"],
+            headers=headers,
+            json=request["json"],
+            params=params,
+        )
 
     async def _ensure_authenticated(self):
         try:
